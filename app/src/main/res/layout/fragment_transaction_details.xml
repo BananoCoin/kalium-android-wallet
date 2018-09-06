@@ -31,13 +31,10 @@
                 android:id="@+id/copy_btn_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
                 android:layout_marginBottom="20dp"
                 android:layout_marginEnd="45dp"
-                android:layout_marginStart="45dp"
-                android:layout_marginTop="30dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/receive_guideline_vert"
-                app:layout_constraintStart_toStartOf="@+id/receive_guideline_vert">
+                android:layout_marginStart="45dp">
 
                 <Button
                     android:id="@+id/tran_details_copy"
@@ -48,7 +45,6 @@
                     android:layout_height="wrap_content"
                     android:text="@string/receive_copy_cta"
                     tools:ignore="UnusedAttribute" />
-
 
                 <Button
                     android:id="@+id/tran_details_copy_overlay"
@@ -61,6 +57,21 @@
                     android:onClick="@{handlers::onClickCopy}"
                     android:text="N/A"
                     tools:ignore="UnusedAttribute" />
+
+                <android.support.v7.widget.AppCompatImageButton
+                    android:id="@+id/add_contact_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:onClick="@{handlers::onClickAddContact}"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerInParent="true"
+                    app:srcCompat="@drawable/ic_contact_add"
+                    android:elevation="5dp"/>
 
             </RelativeLayout>
 

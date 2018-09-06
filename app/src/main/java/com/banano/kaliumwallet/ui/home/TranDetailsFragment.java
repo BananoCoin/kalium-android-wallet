@@ -17,12 +17,19 @@ import android.view.WindowManager;
 import com.banano.kaliumwallet.R;
 import com.banano.kaliumwallet.broadcastreceiver.ClipboardAlarmReceiver;
 import com.banano.kaliumwallet.databinding.FragmentTransactionDetailsBinding;
+import com.banano.kaliumwallet.model.Contact;
 import com.banano.kaliumwallet.ui.common.ActivityWithComponent;
 import com.banano.kaliumwallet.ui.common.BaseDialogFragment;
 import com.banano.kaliumwallet.ui.common.SwipeDismissTouchListener;
 import com.banano.kaliumwallet.ui.common.UIUtil;
 import com.banano.kaliumwallet.ui.common.WindowControl;
+import com.banano.kaliumwallet.ui.contact.AddContactDialogFragment;
 import com.banano.kaliumwallet.ui.webview.WebViewDialogFragment;
+
+import javax.inject.Inject;
+
+import io.realm.Realm;
+import io.realm.RealmQuery;
 
 /**
  * Tran Details Dialog
@@ -35,6 +42,10 @@ public class TranDetailsFragment extends BaseDialogFragment {
     private String mAddress;
     private String mBlockHash;
     private boolean copyRunning = false;
+    private boolean isContact = false;
+
+    @Inject
+    Realm realm;
 
     /**
      * Create new instance of the dialog fragment (handy pattern if any data needs to be passed to it)
@@ -66,6 +77,7 @@ public class TranDetailsFragment extends BaseDialogFragment {
         if (getDialog() != null) {
             getDialog().setCanceledOnTouchOutside(true);
         }
+        isContact = false;
         copyRunning = false;
 
         // Get args
@@ -107,14 +119,25 @@ public class TranDetailsFragment extends BaseDialogFragment {
             public void onTap(View view) { }
         }, SwipeDismissTouchListener.TOP_TO_BOTTOM));
 
-        // Set runnable to reset address copied text
+        // Set runnable to reset address copied text, contact added text
         mHandler = new Handler();
         mRunnable = () -> {
             copyRunning = false;
             binding.tranDetailsCopy.setBackground(getResources().getDrawable(R.drawable.bg_solid_button_normal));
             binding.tranDetailsCopy.setTextColor(getResources().getColor(R.color.gray));
             binding.tranDetailsCopy.setText(getString(R.string.receive_copy_cta));
+            if (!isContact) {
+                binding.addContactBtn.setVisibility(View.VISIBLE);
+            }
         };
+
+        // Show add contact if applicable
+        RealmQuery realmQuery = realm.where(Contact.class);
+        realmQuery.equalTo("address", mAddress);
+        if (realmQuery.count() > 0) {
+            isContact = true;
+            binding.addContactBtn.setVisibility(View.GONE);
+        }
 
         return view;
     }
@@ -142,6 +165,9 @@ public class TranDetailsFragment extends BaseDialogFragment {
                 binding.tranDetailsCopy.setBackground(getResources().getDrawable(R.drawable.bg_green_button_normal));
                 binding.tranDetailsCopy.setTextColor(getResources().getColor(R.color.green_dark));
                 binding.tranDetailsCopy.setText(getString(R.string.receive_copied));
+                if (!isContact) {
+                    binding.addContactBtn.setVisibility(View.GONE);
+                }
 
                 if (mHandler != null) {
                     mHandler.removeCallbacks(mRunnable);
@@ -158,6 +184,17 @@ public class TranDetailsFragment extends BaseDialogFragment {
                         WebViewDialogFragment.TAG);
 
                 ((WindowControl) getActivity()).getFragmentUtility().getFragmentManager().executePendingTransactions();
+            }
+        }
+
+        public void onClickAddContact(View view) {
+            if (getActivity() instanceof WindowControl) {
+                // show receive dialog
+                AddContactDialogFragment dialog = AddContactDialogFragment.newInstance(mAddress);
+                dialog.show(((WindowControl) getActivity()).getFragmentUtility().getFragmentManager(),
+                        AddContactDialogFragment.TAG);
+                ((WindowControl) getActivity()).getFragmentUtility().getFragmentManager().executePendingTransactions();
+                dismiss();
             }
         }
 
