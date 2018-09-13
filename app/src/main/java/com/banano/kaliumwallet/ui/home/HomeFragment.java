@@ -33,6 +33,7 @@ import com.banano.kaliumwallet.bus.WalletHistoryUpdate;
 import com.banano.kaliumwallet.bus.WalletPriceUpdate;
 import com.banano.kaliumwallet.bus.WalletSubscribeUpdate;
 import com.banano.kaliumwallet.databinding.FragmentHomeBinding;
+import com.banano.kaliumwallet.model.Address;
 import com.banano.kaliumwallet.model.Contact;
 import com.banano.kaliumwallet.model.Credentials;
 import com.banano.kaliumwallet.model.KaliumWallet;
@@ -361,12 +362,30 @@ public class HomeFragment extends BaseFragment {
             return;
         }
         updateAccountHistory();
-        mAdapter.notifyDataSetChanged();
+        getActivity().runOnUiThread(() -> {
+            mAdapter.notifyDataSetChanged();
+        });
         UIUtil.showToast(getString(R.string.contact_added, contactAdded.getName()), getContext());
         // Download monKey in background, try to have it available for later
         if (contactAdded.getAddress() != null) {
             String url = getString(R.string.monkey_api_url, contactAdded.getAddress());
             downloadMonkeyTask = new DownloadOrRetrieveFileTask(getContext().getFilesDir());
+            downloadMonkeyTask.setListener((List<File> monkeys) -> {
+                if (monkeys == null || monkeys.isEmpty()) {
+                    return;
+                }
+                for (File f: monkeys) {
+                    if (f.exists()) {
+                        String address = Address.findAddress(f.getAbsolutePath());
+                        if (address != null && !address.isEmpty()) {
+                            realm.executeTransaction(realm -> {
+                                Contact c = realm.where(Contact.class).equalTo("address", address).findFirst();
+                                c.setMonkeyPath(f.getAbsolutePath());
+                            });
+                        }
+                    }
+                }
+            });
             downloadMonkeyTask.execute(url);
         }
     }
@@ -380,7 +399,9 @@ public class HomeFragment extends BaseFragment {
             mContactCache.remove(contactRemoved.getAddress());
         }
         updateAccountHistory();
-        mAdapter.notifyDataSetChanged();
+        getActivity().runOnUiThread(() -> {
+            mAdapter.notifyDataSetChanged();
+        });
         UIUtil.showToast(getString(R.string.contact_removed, contactRemoved.getName()), getContext());
     }
 
@@ -407,6 +428,7 @@ public class HomeFragment extends BaseFragment {
         updateAmounts();
         if (wallet.getOpenBlock() == null) {
             binding.introText.exampleIntroText.setText(UIUtil.colorizeBanano(binding.introText.exampleIntroText.getText().toString(), getContext()));
+            binding.loadingAnimation.setVisibility(View.GONE);
             binding.exampleCards.setVisibility(View.VISIBLE);
         }
     }
