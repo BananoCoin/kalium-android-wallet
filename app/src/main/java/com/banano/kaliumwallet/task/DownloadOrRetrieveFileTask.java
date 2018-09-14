@@ -3,9 +3,14 @@ package com.banano.kaliumwallet.task;
 import android.os.AsyncTask;
 
 import com.banano.kaliumwallet.model.Address;
+import com.caverock.androidsvg.SVG;
+import com.caverock.androidsvg.SVGParseException;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -29,12 +34,21 @@ public class DownloadOrRetrieveFileTask extends AsyncTask<String, Void, List<Fil
         }
         File ret = null;
         HttpURLConnection urlConnection = null;
-        try {
-            String fileName = Address.findAddress(sUrl).trim() + ".svg";
-            File file = new File(fileDir, fileName);
-            if (file.exists()) {
+        String fileName = Address.findAddress(sUrl).trim() + ".svg";
+        File file = new File(fileDir, fileName);
+        if (file.exists()) {
+            // see if SVG is valid
+            try (FileInputStream fis = new FileInputStream(file)) {
+                SVG svg = SVG.getFromInputStream(fis);
                 return file;
+            } catch (SVGParseException se) {
+                file.delete();
+            } catch (IOException ioe) {
+                file.delete();
+                Timber.e(ioe);
             }
+        }
+        try {
             Timber.d("Downloading image %s", sUrl);
             URL imgUrl = new URL(sUrl);
             urlConnection = (HttpURLConnection) imgUrl.openConnection();
