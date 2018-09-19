@@ -158,7 +158,8 @@
     <string name="generic_off">Mati</string>
     <string name="notification_title">Menerima %s BANANO</string>
     <string name="notification_body">Buka Kalium untuk melihat transaksi.</string>
-    <string  name="notificaiton_header_suplement">Tekan untuk membuka</string>
+    <string name="notificaiton_header_suplement">Tekan untuk membuka</string>
+
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">Pindai QR code\n alamat Banano</string>
 </resources>
