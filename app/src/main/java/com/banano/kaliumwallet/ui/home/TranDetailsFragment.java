@@ -91,7 +91,7 @@ public class TranDetailsFragment extends BaseDialogFragment {
 
         // Anchor to bottom
         Window window = getDialog().getWindow();
-        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, (int) UIUtil.convertDpToPixel(280, getContext()));
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, (int) UIUtil.convertDpToPixel(500, getContext()));
         window.setGravity(Gravity.BOTTOM);
 
         // Shadow

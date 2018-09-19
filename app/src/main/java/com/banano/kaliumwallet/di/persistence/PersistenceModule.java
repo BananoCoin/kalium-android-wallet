@@ -39,6 +39,7 @@ public class PersistenceModule {
                     .migration(new Migration())
                     .build();
 
+            Realm.setDefaultConfiguration(realmConfiguration);
             // Open the Realm with encryption enabled
             return Realm.getInstance(realmConfiguration);
         } catch (RealmFileException e) {
@@ -56,6 +57,7 @@ public class PersistenceModule {
                     .migration(new Migration())
                     .build();
 
+            Realm.setDefaultConfiguration(realmConfiguration);
             Realm.deleteRealm(realmConfiguration);
 
             RxBus.get().post(new Logout());

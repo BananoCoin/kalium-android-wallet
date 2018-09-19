@@ -120,6 +120,37 @@
     <string name="send_fingerprint_description">確認指紋發送 %s Banano</string>
     <string name="send_pin_description">發送 %s Banano?</string>
 
+    <string name="contact_add">添加联络人</string>
+    <string name="contact_added">%s 已被添加到联络人！</string>
+    <string name="contact_invalid_name">联络人姓名无效</string>
+    <!-- Add Contact Dialog -->
+    <string name="contact_add_header">添加联络人：</string>
+    <string name="contact_add_button">添加联络人</string>
+    <string name="contact_name_hint">输入姓名@</string>
+    <string name="contact_name_missing">选择此联络人的姓名</string>
+    <string name="contact_name_exists">联络人已存在</string>
+    <string name="contact_address_hint">输入地址</string>
+    <string name="contact_address_exists">联络人已经有了该地址</string>
+    <!-- Contacts Settings -->
+    <string name="contact_header">联络人名单</string>
+    <string name="contact_settings_item">联络人名单</string>
+    <!-- Contact Detail -->
+    <string name="contact_view_header">联络人:</string>
+    <string name="contact_remove_header">删除：</string>
+    <string name="contact_remove_btn">删除联络人</string>
+    <string name="contact_remove_sure">您确定要删除％s吗？</string>
+    <!-- Export/Import -->
+    <string name="contact_removed">％S已从联络人名单中删除！</string>
+    <string name="contact_export_none">没有要导出的联络人</string>
+    <string name="contact_export_error">无法导出联络人</string>
+    <string name="contact_import_error">无法导入联络人</string>
+    <string name="contact_import_success">已成功导入％d个联络人</string>
+    <string name="contact_import_none">找不到要导入的联络人</string>
+    <string name="contact_import_warning_header">警告</string>
+    <string name="contact_import_permission_error">请准许Kalium从这个装置储存中读取.</string>
+    <string name="contact_export_permission_error">请准许Kalium写入这个装置储存.</string>
+    <string name="contact_export_success">联络人名单已保存到％S</string>
+
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">掃描Banano二維碼地址</string>
 </resources>

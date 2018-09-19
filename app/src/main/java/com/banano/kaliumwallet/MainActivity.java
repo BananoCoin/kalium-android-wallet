@@ -24,7 +24,9 @@ import com.banano.kaliumwallet.model.Contact;
 import com.banano.kaliumwallet.model.Credentials;
 import com.banano.kaliumwallet.model.KaliumWallet;
 import com.banano.kaliumwallet.network.AccountService;
+import com.banano.kaliumwallet.ui.common.ActivityFragmentBackButtonInterface;
 import com.banano.kaliumwallet.ui.common.ActivityWithComponent;
+import com.banano.kaliumwallet.ui.common.FragmentOnBackListener;
 import com.banano.kaliumwallet.ui.common.FragmentUtility;
 import com.banano.kaliumwallet.ui.common.WindowControl;
 import com.banano.kaliumwallet.ui.home.HomeFragment;
@@ -38,6 +40,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -47,10 +52,12 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity implements WindowControl, ActivityWithComponent {
+public class MainActivity extends AppCompatActivity implements WindowControl, ActivityWithComponent, ActivityFragmentBackButtonInterface {
     protected ActivityComponent mActivityComponent;
 
     public static boolean appInForeground = false;
+
+    private ArrayList<WeakReference<FragmentOnBackListener>> backClickListenersList = new ArrayList<>();
 
     @Inject
     Realm realm;
@@ -297,5 +304,41 @@ public class MainActivity extends AppCompatActivity implements WindowControl, Ac
     @Override
     public ApplicationComponent getApplicationComponent() {
         return KaliumApplication.getApplication(this).getApplicationComponent();
+    }
+
+    // Handle fragments overriding back button presses
+    @Override
+    public void addBackClickListener(FragmentOnBackListener onBackClickListener) {
+        backClickListenersList.add(new WeakReference<>(onBackClickListener));
+    }
+
+    @Override
+    public void removeBackClickListener(FragmentOnBackListener onBackClickListener) {
+        for (Iterator<WeakReference<FragmentOnBackListener>> iterator = backClickListenersList.iterator();
+             iterator.hasNext();){
+            WeakReference<FragmentOnBackListener> weakRef = iterator.next();
+            if (weakRef.get() == onBackClickListener){
+                iterator.remove();
+            }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(!fragmentsBackKeyIntercept()){
+            super.onBackPressed();
+        }
+    }
+
+    private boolean fragmentsBackKeyIntercept() {
+        boolean isIntercept = false;
+        for (WeakReference<FragmentOnBackListener> weakRef : backClickListenersList) {
+            FragmentOnBackListener onBackClickListener = weakRef.get();
+            if (onBackClickListener != null) {
+                boolean isFragmIntercept = onBackClickListener.onBackClick();
+                if (!isIntercept) isIntercept = isFragmIntercept;
+            }
+        }
+        return isIntercept;
     }
 }
