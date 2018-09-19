@@ -156,6 +156,14 @@
     <string name="contact_export_permission_error">कृपया कलियम को डिवाइस स्टोरेज में लिखने की अनुमति दें।</string>
     <string name="contact_export_success">संपर्क %s में निर्यात (एक्सपोर्ट) हो गए है</string>
 
+    <!-- Push Notifications -->
+    <string name="notifications_settings">सूचनाएं</string>
+    <string name="generic_on">चालू</string>
+    <string name="generic_off">बंद</string>
+    <string name="notification_title"> %s बनानो प्राप्त हुए</string>
+    <string name="notification_body">इस लेनदेन को देखने के लिए केलियम खोलें </string>
+    <string name="notificaiton_header_suplement">ऐप्प खोलने के लिए छुएं</string>
+
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">बनानो के पते का \nक्यू आर कोड स्कैन करें </string>
 </resources>

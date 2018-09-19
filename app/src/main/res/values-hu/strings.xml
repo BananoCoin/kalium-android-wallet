@@ -154,6 +154,13 @@
     <string name="contact_export_permission_error">Engedélyezd a Kaliumnak a hozzáférést az eszköz tárhelyére való írásra.</string>
     <string name="contact_export_success">Kontaktok elmentve: %s</string>
 
+    <!-- Push Notifications -->
+    <string name="notifications_settings">Értesítések</string>
+    <string name="generic_on">Be</string>
+    <string name="generic_off">Ki</string>
+    <string name="notification_title">Kaptál %s BANANO-t</string>
+    <string name="notification_body">Nyisd meg a Kaliumot, hogy megnézhesd a tranzakciót.</string>
+    <string name="notificaiton_header_suplement">Koppints a megnyitáshoz</string>
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">Olvass be QR kóddal egy Banano \ncímet</string>
 </resources>

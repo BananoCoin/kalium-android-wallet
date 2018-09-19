@@ -152,6 +152,14 @@
     <string name="contact_export_permission_error">Mohon Ijinkan Kalium untuk menulis data ponsel.</string>
     <string name="contact_export_success">Kontak tersimpan pada %s</string>
 
+    <!-- Push Notifications -->
+    <string name="notifications_settings">Notifikasi</string>
+    <string name="generic_on">Hidup</string>
+    <string name="generic_off">Mati</string>
+    <string name="notification_title">Menerima %s BANANO</string>
+    <string name="notification_body">Buka Kalium untuk melihat transaksi.</string>
+    <string name="notificaiton_header_suplement">Tekan untuk membuka</string>
+
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">Pindai QR code\n alamat Banano</string>
 </resources>

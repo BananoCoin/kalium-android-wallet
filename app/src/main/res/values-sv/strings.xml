@@ -152,6 +152,14 @@
     <string name="contact_export_permission_error">Vänligen ge Kalium tillåtelse till att skriva på enheten.</string>
     <string name="contact_export_success">Kontakter sparade till %s</string>
 
+    <!-- Push Notifications -->
+    <string name="notifications_settings">Aviseringar</string>
+    <string name="generic_on">På</string>
+    <string name="generic_off">Av</string>
+    <string name="notification_title">Mottog %s BANANO</string>
+    <string name="notification_body">Öppna Kalium för att visa transaktion.</string>
+    <string name="notificaiton_header_suplement">Tryck för att öppna</string>
+
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">Skanna en Banano\nadress QR-kod</string>
 </resources>

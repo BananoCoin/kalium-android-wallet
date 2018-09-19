@@ -139,4 +139,11 @@
     <string name="contact_import_permission_error">Va rugăm să acordați permisiunea de a utiliza spațiul de stocare.</string>
     <string name="contact_export_permission_error">Va rugăm să acordați permisiunea de a utiliza spațiul de stocare.</string>
     <string name="contact_export_success">Contacte salvate in %s</string>
+    <!-- Push Notifications -->
+    <string name="notifications_settings">Notificări</string>
+    <string name="generic_on">Activate</string>
+    <string name="generic_off">Dezactivate</string>
+    <string name="notification_title">Ai primit %s BANANO</string>
+    <string name="notification_body">Deschide Kalium pentru a vizualiza tranzacția.</string>
+    <string name="notificaiton_header_suplement">Apasă pentru deschidere</string>
 </resources>

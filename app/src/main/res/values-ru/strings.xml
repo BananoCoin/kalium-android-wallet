@@ -154,6 +154,13 @@
     <string name="contact_export_permission_error">Разрешите Kalium записывать на устройство</string>
     <string name="contact_export_success">Контакты сохранены в %s</string>
 
+    <!-- Push Notifications -->
+    <string name="notifications_settings">Уведомления</string>
+    <string name="generic_on">Вкл.</string>
+    <string name="generic_off">Выкл.</string>
+    <string name="notification_title">Полученно %s BANANO</string>
+    <string name="notification_body">Откройте Kalium для просмотра транзакции.</string>
+    <string name="notificaiton_header_suplement">Нажмите чтобы открыть</string>
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">Сканировать  QR-код Banano/адрес.</string>
 </resources>

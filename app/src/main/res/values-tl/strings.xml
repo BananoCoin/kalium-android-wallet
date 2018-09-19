@@ -154,6 +154,14 @@
     <string name="contact_export_permission_error">Mangyaring payagan ang Kalium para magsulat sa device storage.</string>
     <string name="contact_export_success">Ang mga kontak ay nai-save sa %s</string>
 
+    <!-- Push Notifications -->
+    <string name="notifications_settings">Abiso</string>
+    <string name="generic_on">On</string>
+    <string name="generic_off">Off</string>
+    <string name="notification_title">Nakatanggap ng %s BANANO</string>
+    <string name="notification_body">Buksan ang Kalium para tingnan ito.</string>
+    <string name="notificaiton_header_suplement">Tapikin para mabuksan</string>
+
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">I-scan ang Banano \naddress QR code</string>
 </resources>

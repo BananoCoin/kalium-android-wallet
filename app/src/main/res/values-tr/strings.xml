@@ -155,6 +155,13 @@
     <string name="contact_export_permission_error">Lütfen Kalium\'a cihazdan okuma izni ver.</string>
     <string name="contact_export_success">Rehber şuraya kaydedildi: %s</string>
 
+    <!-- Push Notifications -->
+    <string name="notifications_settings">Bildirimler</string>
+    <string name="generic_on">Açık</string>
+    <string name="generic_off">Kapalı</string>
+    <string name="notification_title">%s BANANO Alındı</string>
+    <string name="notification_body">Bu transferi görmek için Kalium’u aç.</string>
+    <string name="notificaiton_header_suplement">Açmak için dokun</string>
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">Banano Adresi\'nin \n QR Kodu\'nu tarayın</string>
 </resources>
