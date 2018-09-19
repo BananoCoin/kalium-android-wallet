@@ -65,7 +65,7 @@ public class KaliumMessagingService extends FirebaseMessagingService {
         NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
                 getString(R.string.app_name),
                 NotificationManager.IMPORTANCE_HIGH);
-        channel.setDescription("Natrium transaction alerts");
+        channel.setDescription("Kalium transaction alerts");
         notificationManager.createNotificationChannel(channel);
     }
 
