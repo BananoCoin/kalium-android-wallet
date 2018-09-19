@@ -23,7 +23,7 @@
     <string name="pin_confirm_error">PIN-urile nu corespund</string>
     <string name="pin_error">PIN invalid</string>
     <string name="fingerprint_text">Senzor de amprente</string>
-    <string name="home_send_cta">Trimite</string>
+    <string name="home_send_cta">Trimise</string>
     <string name="home_receive_cta">Primește</string>
     <!-- Shown when there are no transactions -->
     <string name="example_card_intro">Bun venit la Kalium. Odată ce primiți sau trimiteți BANANO, tranzacțiile vor arăta astfel:</string>
@@ -60,7 +60,7 @@
     <string name="change_representative_header">Schimbă\n reprezentantul</string>
     <string name="change_representative_header_short">Schimbă</string>
     <string name="change_representative_info_header">Ce este un reprezentant?</string>
-    <string name="change_representative_info">Un reprezentant este un cont care votează pentru buna funcționare a rețelei. Puterea de vot este determinată de sold. Puteți delega soldul dumneavoastră pentru a mari puterea de vot a unui reprezentant de încredere. Acesta nu poate cheltui fondurile dumneavoastră. Alegeți un reprezentant activ și de încredere.</string>
+    <string name="change_representative_info">Un reprezentant este un cont care votează pentru buna funcționare a rețelei. Puterea de vot este determinată de sold. Puteți delega soldul dumneavoastră pentru a mări puterea de vot a unui reprezentant de încredere. Acesta nu poate cheltui fondurile dumneavoastră. Alegeți un reprezentant activ și de încredere.</string>
     <string name="change_representative_dialog_close">Închide</string>
     <string name="change_representative_change">Schimbă</string>
     <string name="change_representative_cancel">Renunţare</string>
@@ -114,7 +114,7 @@
     <string name="contact_invalid_name">Nume invalid</string>
     <!-- Add Contact Dialog -->
     <string name="contact_add_header">Adaugă contact:</string>
-    <string name="contact_add_button">Adaugă contactul</string>
+    <string name="contact_add_button">Adaugă un contact</string>
     <string name="contact_name_hint">Introdu un nume @</string>
     <string name="contact_name_missing">Alege un nume pentru acest contact</string>
     <string name="contact_name_exists">Contact deja existent</string>

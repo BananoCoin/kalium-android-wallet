@@ -1,5 +1,7 @@
 package com.banano.kaliumwallet.ui.home;
 
+import android.app.Activity;
+import android.content.Context;
 import android.databinding.BindingMethod;
 import android.databinding.BindingMethods;
 import android.databinding.DataBindingUtil;
@@ -42,8 +44,10 @@ import com.banano.kaliumwallet.network.AccountService;
 import com.banano.kaliumwallet.network.model.response.AccountCheckResponse;
 import com.banano.kaliumwallet.network.model.response.AccountHistoryResponseItem;
 import com.banano.kaliumwallet.task.DownloadOrRetrieveFileTask;
+import com.banano.kaliumwallet.ui.common.ActivityFragmentBackButtonInterface;
 import com.banano.kaliumwallet.ui.common.ActivityWithComponent;
 import com.banano.kaliumwallet.ui.common.BaseFragment;
+import com.banano.kaliumwallet.ui.common.FragmentOnBackListener;
 import com.banano.kaliumwallet.ui.common.FragmentUtility;
 import com.banano.kaliumwallet.ui.common.KeyboardUtil;
 import com.banano.kaliumwallet.ui.common.UIUtil;
@@ -82,9 +86,11 @@ import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOption
                 attribute = "srcCompat",
                 method = "setImageDrawable")
 })
-public class HomeFragment extends BaseFragment {
+public class HomeFragment extends BaseFragment implements FragmentOnBackListener {
     public static String TAG = HomeFragment.class.getSimpleName();
+
     public boolean retrying = false;
+
     @Inject
     AccountService accountService;
     @Inject
@@ -93,6 +99,8 @@ public class HomeFragment extends BaseFragment {
     Realm realm;
     @Inject
     SharedPreferencesUtil sharedPreferencesUtil;
+
+    private ActivityFragmentBackButtonInterface backButtonHandler;
     private FragmentHomeBinding binding;
     private DownloadOrRetrieveFileTask downloadMonkeyTask;
     private Handler mHandler;
@@ -110,6 +118,24 @@ public class HomeFragment extends BaseFragment {
         HomeFragment fragment = new HomeFragment();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        Activity activity;
+        if (context instanceof Activity){
+            activity = (Activity) context;
+            backButtonHandler = (ActivityFragmentBackButtonInterface) activity;
+            backButtonHandler.addBackClickListener(this);
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        backButtonHandler.removeBackClickListener(this);
+        backButtonHandler = null;
     }
 
     @Override
@@ -230,20 +256,6 @@ public class HomeFragment extends BaseFragment {
             }
         }
 
-        // Override back button press
-        view.setFocusableInTouchMode(true);
-        view.requestFocus();
-        view.setOnKeyListener((View v, int keyCode, KeyEvent event) -> {
-            if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
-                if (binding.monkeyOverlay.getVisibility() == View.VISIBLE) {
-                    // Close monKey if open
-                    hideMonkeyOverlay();
-                    return true;
-                }
-            }
-            return false;
-        });
-
         // Hack for easier settings access https://stackoverflow.com/questions/17942223/drawerlayout-modify-sensitivity
         // assuming mDrawerLayout is an instance of android.support.v4.widget.DrawerLayout
         try {
@@ -328,6 +340,15 @@ public class HomeFragment extends BaseFragment {
         return view;
     }
 
+    @Override
+    public boolean onBackClick() {
+        if (binding.monkeyOverlay.getVisibility() == View.VISIBLE) {
+            // Close monKey if open
+            hideMonkeyOverlay();
+            return true;
+        }
+        return false;
+    }
     private String getContactName(String address) {
         if (mContactCache.containsKey(address)) {
             return mContactCache.get(address);
