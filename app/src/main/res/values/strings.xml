@@ -169,7 +169,7 @@
     <string name="notifications_settings">Notifications</string>
     <string name="generic_on">On</string>
     <string name="generic_off">Off</string>
-    <string name="notification_title">Received %s BAN</string>
+    <string name="notification_title">Received %s BANANO</string>
     <string name="notification_body">Open Kalium to view this transaction.</string>
     <string name="notificaiton_header_suplement">Tap to open</string>
 

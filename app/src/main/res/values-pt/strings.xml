@@ -149,6 +149,13 @@
     <string name="contact_export_permission_error">Por favor, permita que Kalium edite os arquivos do dispositivo.</string>
     <string name="contact_export_success">Contatos salvos em %s</string>
 
+    <!-- Push Notifications -->
+    <string name="notifications_settings">Notificações</string>
+    <string name="generic_on">Ativar</string>
+    <string name="generic_off">Desativar</string>
+    <string name="notification_title">Recebido %s BANANO</string>
+    <string name="notification_body">Abra a Kalium para ver esta transação.</string>
+    <string name="notificaiton_header_suplement">Toque para abrir</string>
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">Escaneie o código QR \nde um endereço Banano</string>
 </resources>

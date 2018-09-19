@@ -155,6 +155,14 @@
     <string name="contact_export_permission_error">בבקשה תאפשר לקאליום לכתוב לזיכרון המכשיר.</string>
     <string name="contact_export_success">אנשי הקשר נשמרו ל%s</string>
 
+    <!-- Push Notifications -->
+    <string name="notifications_settings">התראות</string>
+    <string name="generic_on">פועל</string>
+    <string name="generic_off">כבוי</string>
+    <string name="notification_title">%s באנאנו התקבלו</string>
+    <string name="notification_body">פתח את קאליום בשביל לצפות בטרנסקציה.</string>
+    <string name="notificaiton_header_suplement">לחץ בשביל לפתוח</string>
+
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">סרוק כתובת ברקוד \n של באנאנו</string>
 </resources>
