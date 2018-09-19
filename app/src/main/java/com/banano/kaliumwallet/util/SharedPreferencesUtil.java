@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import com.banano.kaliumwallet.model.AuthMethod;
 import com.banano.kaliumwallet.model.AvailableCurrency;
 import com.banano.kaliumwallet.model.AvailableLanguage;
+import com.banano.kaliumwallet.model.NotificationOption;
 import com.banano.kaliumwallet.model.PreconfiguredRepresentatives;
 import com.banano.kaliumwallet.model.PriceConversion;
 import com.github.ajalt.reprint.core.Reprint;
@@ -27,6 +28,8 @@ public class SharedPreferencesUtil {
     private static final String AUTH_METHOD = "auth_method";
     private static final String PRICE_CONVERSION = "price_conversion";
     private static final String DEFAULT_CONTACT_ADDED = "default_contact_added";
+    private static final String FCM_TOKEN = "fcm_token";
+    private static final String PUSH_NOTIFICATIONS = "push_notifications";
 
     private final SharedPreferences mPrefs;
 
@@ -141,6 +144,22 @@ public class SharedPreferencesUtil {
 
     public void setPriceConversion(PriceConversion conversion) {
         set(PRICE_CONVERSION, conversion.toString());
+    }
+
+    public String getFcmToken() {
+        return get(FCM_TOKEN, null);
+    }
+
+    public void setFcmToken(String fcmToken) {
+        set(FCM_TOKEN, fcmToken);
+    }
+
+    public NotificationOption getNotificationSetting() {
+        return NotificationOption.valueOf(get(PUSH_NOTIFICATIONS, NotificationOption.ON.toString()));
+    }
+
+    public void setNotificationSetting(NotificationOption option) {
+        set(PUSH_NOTIFICATIONS, option.toString());
     }
 
     public boolean isDefaultContactAdded() {

@@ -1,5 +1,6 @@
 package com.banano.kaliumwallet;
 
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
@@ -48,6 +49,9 @@ import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements WindowControl, ActivityWithComponent {
     protected ActivityComponent mActivityComponent;
+
+    public static boolean appInForeground = false;
+
     @Inject
     Realm realm;
     @Inject
@@ -61,6 +65,9 @@ public class MainActivity extends AppCompatActivity implements WindowControl, Ac
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        appInForeground = true;
+
+        clearNotificationPrefCache();
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
@@ -116,21 +123,12 @@ public class MainActivity extends AppCompatActivity implements WindowControl, Ac
 
     private File moveHeisenbergFromAssets() throws IOException {
         File heisenberg = new File(getFilesDir(), "ban_1ka1ium4pfue3uxtntqsrib8mumxgazsjf58gidh1xeo5te3whsq8z476goo.svg");
-        try {
-            InputStream inputStream = getAssets().open("heisenberg.svg");
-            try {
-                FileOutputStream outputStream = new FileOutputStream(heisenberg);
-                try {
-                    byte[] buf = new byte[1024];
-                    int len;
-                    while ((len = inputStream.read(buf)) > 0) {
-                        outputStream.write(buf, 0, len);
-                    }
-                } finally {
-                    outputStream.close();
-                }
-            } finally {
-                inputStream.close();
+        try (InputStream inputStream = getAssets().open("heisenberg.svg");
+             FileOutputStream outputStream = new FileOutputStream(heisenberg)) {
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = inputStream.read(buf)) > 0) {
+                outputStream.write(buf, 0, len);
             }
         } catch (IOException e) {
             throw new IOException("Could not open heisenbergsvg", e);
@@ -138,9 +136,17 @@ public class MainActivity extends AppCompatActivity implements WindowControl, Ac
         return heisenberg;
     }
 
+    private void clearNotificationPrefCache() {
+        SharedPreferences sharedPreferences = getSharedPreferences("NotificationData", 0);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
+        appInForeground = false;
         // stop websocket on pause
         if (accountService != null) {
             accountService.close();
@@ -150,6 +156,8 @@ public class MainActivity extends AppCompatActivity implements WindowControl, Ac
     @Override
     protected void onResume() {
         super.onResume();
+        appInForeground = true;
+        clearNotificationPrefCache();
         // start websocket on resume
         if (accountService != null && realm != null && !realm.isClosed() && realm.where(Credentials.class).findFirst() != null) {
             accountService.open();
