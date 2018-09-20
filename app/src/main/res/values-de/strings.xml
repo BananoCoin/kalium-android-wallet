@@ -152,6 +152,14 @@
     <string name="contact_export_permission_error">Bitte erteile Kalium Schreibzugriff.</string>
     <string name="contact_export_success">Kontakte gespeichert in %s</string>
 
+    <!-- Push Notifications -->
+    <string name="notifications_settings">Benachrichtigungen</string>
+    <string name="generic_on">An</string>
+    <string name="generic_off">Aus</string>
+    <string name="notification_title">%s BANANO erhalten</string>
+    <string name="notification_body">Öffne Kalium, um diese Transaktion zu sehen.</string>
+    <string name="notificaiton_header_suplement">Zum Öffnen tippen</string>
+
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">Scanne einen\nBanano-Address-QR-Code</string>
 </resources>

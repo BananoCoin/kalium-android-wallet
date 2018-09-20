@@ -71,7 +71,7 @@ import timber.log.Timber;
  */
 
 public class AccountService {
-    public static final int TIMEOUT_MILLISECONDS = 10000;
+    public static final int TIMEOUT_MILLISECONDS = 5000;
     @Inject
     SharedPreferencesUtil sharedPreferencesUtil;
     @Inject
@@ -122,7 +122,7 @@ public class AccountService {
                 .writeTimeout(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS)
                 .readTimeout(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS)
                 .connectTimeout(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS)
-                .pingInterval(5000, TimeUnit.MILLISECONDS)
+                .pingInterval(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS)
                 .build();
 
         Request request = new Request.Builder()
