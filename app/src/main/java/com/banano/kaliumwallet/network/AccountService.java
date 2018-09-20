@@ -118,12 +118,7 @@ public class AccountService {
      */
     private void initWebSocket() {
         // create websocket
-        OkHttpClient client = new OkHttpClient.Builder()
-                .writeTimeout(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS)
-                .readTimeout(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS)
-                .connectTimeout(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS)
-                .pingInterval(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS)
-                .build();
+        OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
                 .url(BuildConfig.CONNECTION_URL)
