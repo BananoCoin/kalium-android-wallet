@@ -105,9 +105,9 @@
     <string name="send_sending">Sende</string>
     <string name="send_to">An:</string>
     <string name="sent_to">Gesendet an:</string>
-    <string name="send_confirm">Bestätigen</string>
-    <string name="send_cancel">Abbrechen</string>
-    <string name="send_close">Schließen</string>
+    <string name="dialog_confirm">Bestätigen</string>
+    <string name="dialog_cancel">Abbrechen</string>
+    <string name="dialog_close">Schließen</string>
     <string name="send_alert_dialog_ok">OK</string>
     <string name="send_alert_dialog_title">Ungültige Eingabe</string>
     <string name="send_invalid_address">Ungültige Empfänger-Adresse</string>
@@ -119,6 +119,46 @@
     <string name="send_no_frontier">Kein Frontier gefunden (Empfänger-Account eventuell noch nicht erstellt)</string>
     <string name="send_fingerprint_description">Scanne Fingerabdruck, um %s Bananos zu senden</string>
     <string name="send_pin_description">%s Bananos senden?</string>
+
+    <!-- Address Book/Contacts -->
+    <string name="contact_add">Neuer Kontakt</string>
+    <string name="contact_added">%s zu Kontakten hinzugefügt!</string>
+    <string name="contact_invalid_name">Ungültiger Kontaktname</string>
+    <!-- Add Contact Dialog -->
+    <string name="contact_add_header">Neuer Kontakt:</string>
+    <string name="contact_add_button">Neuer Kontakt</string>
+    <string name="contact_name_hint">Namen eingeben @</string>
+    <string name="contact_name_missing">Wähle einen Namen für den Kontakt</string>
+    <string name="contact_name_exists">Kontakt bereits vorhanden</string>
+    <string name="contact_address_hint">Adresse eingeben</string>
+    <string name="contact_address_exists">Ein Kontakt mit dieser Adresse existiert bereits</string>
+    <!-- Contacts Settings -->
+    <string name="contact_header">Kontakte</string>
+    <string name="contact_settings_item">Adressbuch</string>
+    <!-- Contact Detail -->
+    <string name="contact_view_header">Kontakt:</string>
+    <string name="contact_remove_header">Löschen:</string>
+    <string name="contact_remove_btn">Kontakt löschen</string>
+    <string name="contact_remove_sure">Willst du %s wirklich löschen?</string>
+    <!-- Export/Import -->
+    <string name="contact_removed">%s wurde aus den Kontakten gelöscht!</string>
+    <string name="contact_export_none">Keine Kontakte zum Exportieren gefunden</string>
+    <string name="contact_export_error">Export fehlgeschlagen</string>
+    <string name="contact_import_error">Import fehlgeschlagen</string>
+    <string name="contact_import_success">%d Kontakte wurden importiert</string>
+    <string name="contact_import_none">Keine Kontakte zum Importieren gefunden</string>
+    <string name="contact_import_warning_header">Warnung</string>
+    <string name="contact_import_permission_error">Bitte erteile Kalium Lesezugriff.</string>
+    <string name="contact_export_permission_error">Bitte erteile Kalium Schreibzugriff.</string>
+    <string name="contact_export_success">Kontakte gespeichert in %s</string>
+
+    <!-- Push Notifications -->
+    <string name="notifications_settings">Benachrichtigungen</string>
+    <string name="generic_on">An</string>
+    <string name="generic_off">Aus</string>
+    <string name="notification_title">%s BANANO erhalten</string>
+    <string name="notification_body">Öffne Kalium, um diese Transaktion zu sehen.</string>
+    <string name="notificaiton_header_suplement">Zum Öffnen tippen</string>
 
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">Scanne einen\nBanano-Address-QR-Code</string>

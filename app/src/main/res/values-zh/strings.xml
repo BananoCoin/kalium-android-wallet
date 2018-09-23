@@ -105,9 +105,9 @@
     <string name="send_sending">发出</string>
     <string name="send_to">至：</string>
     <string name="sent_to">发给：</string>
-    <string name="send_confirm">确认</string>
-    <string name="send_cancel">取消</string>
-    <string name="send_close">关闭</string>
+    <string name="dialog_confirm">确认</string>
+    <string name="dialog_cancel">取消</string>
+    <string name="dialog_close">关闭</string>
     <string name="send_alert_dialog_ok">好</string>
     <string name="send_alert_dialog_title">输入无效</string>
     <string name="send_invalid_address">无效的目标地址</string>
@@ -119,6 +119,45 @@
     <string name="send_no_frontier">找不到帐号边框（帐号可能无法打开）</string>
     <string name="send_fingerprint_description">确认指纹发送 %s Banano</string>
     <string name="send_pin_description">发送 %s Banano?</string>
+
+    <string name="contact_add">添加聯絡人</string>
+    <string name="contact_added">%s已被添加到聯絡人！</string>
+    <string name="contact_invalid_name">聯絡人姓名無效</string>
+    <!-- Add Contact Dialog -->
+    <string name="contact_add_header">添加聯絡人:</string>
+    <string name="contact_add_button">添加聯絡人</string>
+    <string name="contact_name_hint">輸入姓名@</string>
+    <string name="contact_name_missing">選擇此聯絡人的姓名</string>
+    <string name="contact_name_exists">聯絡人已存在</string>
+    <string name="contact_address_hint">輸入地址</string>
+    <string name="contact_address_exists">聯絡人已經有了該地址</string>
+    <!-- Contacts Settings -->
+    <string name="contact_header">聯絡人名單</string>
+    <string name="contact_settings_item">聯絡人名單</string>
+    <!-- Contact Detail -->
+    <string name="contact_view_header">聯絡人:</string>
+    <string name="contact_remove_header">刪除:</string>
+    <string name="contact_remove_btn">刪除聯絡人</string>
+    <string name="contact_remove_sure">您確定要刪除%s嗎？</string>
+    <!-- Export/Import -->
+    <string name="contact_removed">%s已從聯絡人名單中刪除!</string>
+    <string name="contact_export_none">沒有要導出的聯絡人</string>
+    <string name="contact_export_error">無法導出聯絡人</string>
+    <string name="contact_import_error">無法導入聯絡人</string>
+    <string name="contact_import_success">已成功導入％d個聯絡人</string>
+    <string name="contact_import_none">找不到要導入的聯絡人</string>
+    <string name="contact_import_warning_header">警告</string>
+    <string name="contact_import_permission_error">請准許Kalium從這個裝置儲存中讀取.</string>
+    <string name="contact_export_permission_error">請准許Kalium寫入這個裝置儲存.</string>
+    <string name="contact_export_success">聯絡人名單已保存到％s</string>
+
+    <!-- Push Notifications -->
+    <string name="notifications_settings">通知</string>
+    <string name="generic_on">开启</string>
+    <string name="generic_off">关闭 </string>
+    <string name="notification_title">收到 %s BANANO</string>
+    <string name="notification_body">打开Kalium查看此交易.</string>
+    <string name="notificaiton_header_suplement">点击打开 </string>
 
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">扫描Banano二维码地址</string>

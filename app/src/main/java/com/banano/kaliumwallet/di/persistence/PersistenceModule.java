@@ -3,14 +3,15 @@ package com.banano.kaliumwallet.di.persistence;
 import android.content.Context;
 import android.util.Base64;
 
-import javax.inject.Named;
-
 import com.banano.kaliumwallet.bus.Logout;
 import com.banano.kaliumwallet.bus.RxBus;
 import com.banano.kaliumwallet.db.Migration;
 import com.banano.kaliumwallet.di.application.ApplicationScope;
 import com.banano.kaliumwallet.util.SharedPreferencesUtil;
 import com.banano.kaliumwallet.util.Vault;
+
+import javax.inject.Named;
+
 import dagger.Module;
 import dagger.Provides;
 import io.realm.Realm;
@@ -19,7 +20,7 @@ import io.realm.exceptions.RealmFileException;
 
 @Module
 public class PersistenceModule {
-    private static final int SCHEMA_VERSION = 1;
+    private static final int SCHEMA_VERSION = 2;
     private static final String DB_NAME = "kalium.realm";
 
     @Provides
@@ -38,6 +39,7 @@ public class PersistenceModule {
                     .migration(new Migration())
                     .build();
 
+            Realm.setDefaultConfiguration(realmConfiguration);
             // Open the Realm with encryption enabled
             return Realm.getInstance(realmConfiguration);
         } catch (RealmFileException e) {
@@ -55,6 +57,7 @@ public class PersistenceModule {
                     .migration(new Migration())
                     .build();
 
+            Realm.setDefaultConfiguration(realmConfiguration);
             Realm.deleteRealm(realmConfiguration);
 
             RxBus.get().post(new Logout());

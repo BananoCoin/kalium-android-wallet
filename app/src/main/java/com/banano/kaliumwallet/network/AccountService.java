@@ -4,26 +4,8 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.banano.kaliumwallet.KaliumUtil;
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.internal.LinkedTreeMap;
-
-import java.math.BigInteger;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import com.banano.kaliumwallet.BuildConfig;
+import com.banano.kaliumwallet.KaliumUtil;
 import com.banano.kaliumwallet.bus.RxBus;
 import com.banano.kaliumwallet.bus.SocketError;
 import com.banano.kaliumwallet.model.Address;
@@ -58,6 +40,24 @@ import com.banano.kaliumwallet.ui.common.ActivityWithComponent;
 import com.banano.kaliumwallet.util.ExceptionHandler;
 import com.banano.kaliumwallet.util.NumberUtil;
 import com.banano.kaliumwallet.util.SharedPreferencesUtil;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.internal.LinkedTreeMap;
+
+import java.math.BigInteger;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import io.realm.Realm;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -71,29 +71,23 @@ import timber.log.Timber;
  */
 
 public class AccountService {
-    public static final int TIMEOUT_MILLISECONDS = 10000;
-
+    public static final int TIMEOUT_MILLISECONDS = 5000;
+    @Inject
+    SharedPreferencesUtil sharedPreferencesUtil;
+    @Inject
+    KaliumWallet wallet;
+    @Inject
+    Gson gson;
+    @Inject
+    Realm realm;
+    @Inject
+    @Named("encryption_key")
+    byte[] encryption_key;
     private WebSocket websocket;
     private boolean connected = false;
     private LinkedList<RequestItem> requestQueue = new LinkedList<>();
     private String private_key;
     private Address address;
-
-    @Inject
-    SharedPreferencesUtil sharedPreferencesUtil;
-
-    @Inject
-    KaliumWallet wallet;
-
-    @Inject
-    Gson gson;
-
-    @Inject
-    Realm realm;
-
-    @Inject
-    @Named("encryption_key")
-    byte[] encryption_key;
 
     public AccountService(Context context) {
         // init dependency injection
@@ -124,12 +118,7 @@ public class AccountService {
      */
     private void initWebSocket() {
         // create websocket
-        OkHttpClient client = new OkHttpClient.Builder()
-                .writeTimeout(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS)
-                .readTimeout(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS)
-                .connectTimeout(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS)
-                .pingInterval(5000, TimeUnit.MILLISECONDS)
-                .build();
+        OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
                 .url(BuildConfig.CONNECTION_URL)
@@ -298,7 +287,7 @@ public class AccountService {
      */
     private void handleBlocksInfoResponse(BlocksInfoResponse blocksInfo) {
         HashMap<String, BlockInfoItem> blocks = blocksInfo.getBlocks();
-        if (blocks.size () != 1) {
+        if (blocks.size() != 1) {
             ExceptionHandler.handle(new Exception("unexpected amount of blocks in blocks_info response"));
             requestQueue.poll();
             requestQueue.poll();
@@ -559,8 +548,8 @@ public class AccountService {
                         processQueue();
                     } else if ((requestItem.getRequest() instanceof StateBlock) &&
                             (((Block) requestItem.getRequest()).getInternal_block_type() == BlockTypes.SEND ||
-                            ((Block) requestItem.getRequest()).getInternal_block_type() == BlockTypes.RECEIVE ||
-                            ((Block) requestItem.getRequest()).getInternal_block_type() == BlockTypes.CHANGE) &&
+                                    ((Block) requestItem.getRequest()).getInternal_block_type() == BlockTypes.RECEIVE ||
+                                    ((Block) requestItem.getRequest()).getInternal_block_type() == BlockTypes.CHANGE) &&
                             ((StateBlock) requestItem.getRequest()).getBalance() == null) {
                         ExceptionHandler.handle(new Exception("Head block request failed."));
                         requestQueue.poll();
@@ -586,7 +575,7 @@ public class AccountService {
      */
     public void requestUpdate() {
         if (address != null && address.getAddress() != null) {
-            requestQueue.add(new RequestItem<>(new SubscribeRequest(address.getAddress(), getLocalCurrency(), wallet.getUuid())));
+            requestQueue.add(new RequestItem<>(new SubscribeRequest(address.getAddress(), getLocalCurrency(), wallet.getUuid(), sharedPreferencesUtil.getFcmToken())));
             requestQueue.add(new RequestItem<>(new AccountHistoryRequest(address.getAddress(), wallet.getBlockCount() != null ? wallet.getBlockCount() : 10)));
             requestQueue.add(new RequestItem<>(new PendingTransactionsRequest(address.getAddress(), true, wallet.getBlockCount())));
             processQueue();
@@ -598,7 +587,7 @@ public class AccountService {
      */
     public void requestSubscribe() {
         if (address != null && address.getAddress() != null) {
-            requestQueue.add(new RequestItem<>(new SubscribeRequest(address.getAddress(), getLocalCurrency(), wallet.getUuid())));
+            requestQueue.add(new RequestItem<>(new SubscribeRequest(address.getAddress(), getLocalCurrency(), wallet.getUuid(), sharedPreferencesUtil.getFcmToken())));
             processQueue();
         }
     }
@@ -661,7 +650,7 @@ public class AccountService {
         requestQueue.add(new RequestItem<>(new WorkRequest(previous)));
 
         // create a get_block request
-        requestQueue.add(new RequestItem<>(new GetBlocksInfoRequest(new String[] {previous})));
+        requestQueue.add(new RequestItem<>(new GetBlocksInfoRequest(new String[]{previous})));
 
         // create a state block for receiving
         requestQueue.add(new RequestItem<>(new StateBlock(
@@ -690,7 +679,7 @@ public class AccountService {
         requestQueue.add(new RequestItem<>(new WorkRequest(previous)));
 
         // create a get_block request
-        requestQueue.add(new RequestItem<>(new GetBlocksInfoRequest(new String[] {previous})));
+        requestQueue.add(new RequestItem<>(new GetBlocksInfoRequest(new String[]{previous})));
 
         // create a state block for sending
         requestQueue.add(new RequestItem<>(new StateBlock(
@@ -708,8 +697,8 @@ public class AccountService {
     /**
      * Make a no-op request
      *
-     * @param previous    Previous hash
-     * @param balance     Current Wallet Balance
+     * @param previous       Previous hash
+     * @param balance        Current Wallet Balance
      * @param representative Representative
      */
     public void requestChange(String previous, BigInteger balance, String representative) {
@@ -794,7 +783,7 @@ public class AccountService {
         for (RequestItem item : requestQueue) {
             if (item.getRequest() instanceof OpenBlock ||
                     (item.getRequest() instanceof StateBlock &&
-                    ((StateBlock) item.getRequest()).getInternal_block_type().equals(BlockTypes.OPEN))) {
+                            ((StateBlock) item.getRequest()).getInternal_block_type().equals(BlockTypes.OPEN))) {
                 return true;
             }
         }
@@ -873,7 +862,7 @@ public class AccountService {
             } else if (o != null && o instanceof WorkRequest) {
                 ((WorkRequest) o).setHash(frontier);
             } else if (o != null && o instanceof GetBlocksInfoRequest) {
-                ((GetBlocksInfoRequest) o).setHashes(new String[] {frontier});
+                ((GetBlocksInfoRequest) o).setHashes(new String[]{frontier});
             }
         }
     }

@@ -107,9 +107,9 @@
     <string name="send_sending">Pinapadala</string>
     <string name="send_to">Sa:</string>
     <string name="sent_to">Pinadala sa:</string>
-    <string name="send_confirm">Kumpirmahin</string>
-    <string name="send_cancel">Kanselahin</string>
-    <string name="send_close">Isara</string>
+    <string name="dialog_confirm">Kumpirmahin</string>
+    <string name="dialog_cancel">Kanselahin</string>
+    <string name="dialog_close">Isara</string>
     <string name="send_alert_dialog_ok">OK</string>
     <string name="send_alert_dialog_title">Hindi wasto ang Input</string>
     <string name="send_invalid_address">Hindi wasto ang Destination Address</string>
@@ -121,6 +121,46 @@
     <string name="send_no_frontier">Hindi mahanap ang hangganan ng account (maaaring hindi pa nabuksan ang account)</string>
     <string name="send_fingerprint_description">Kumpirmahin ang fingerprint para magpadala ng %s Banano</string>
     <string name="send_pin_description">Magpadala ng %s Banano?</string>
+
+    <!-- Address Book/Contacts -->
+    <string name="contact_add">Mag-add ng kontak</string>
+    <string name="contact_added">%s ay nadagdag sa mga kontak!</string>
+    <string name="contact_invalid_name">Hindi tugma sa kontak</string>
+    <!-- Add Contact Dialog -->
+    <string name="contact_add_header">Mag-add ng kontak:</string>
+    <string name="contact_add_button">Mag-add ng kontak</string>
+    <string name="contact_name_hint">Ilagay ang pangalan @</string>
+    <string name="contact_name_missing">Pumili ng pangalan para sa kontak na ito</string>
+    <string name="contact_name_exists">Mayroon nang kapareho</string>
+    <string name="contact_address_hint">Ilagay ang address</string>
+    <string name="contact_address_exists">Ang ibang kontak ay mayroon nang ganitong address</string>
+    <!-- Contacts Settings -->
+    <string name="contact_header">Mga kontak</string>
+    <string name="contact_settings_item">Mga kontak</string>
+    <!-- Contact Detail -->
+    <string name="contact_view_header">Kontak:</string>
+    <string name="contact_remove_header">Alisin:</string>
+    <string name="contact_remove_btn">Alisin ang kontak</string>
+    <string name="contact_remove_sure">Sigurado ka ba gusto mong tanggalin ang %s?</string>
+    <!-- Export/Import -->
+    <string name="contact_removed">%s ay natanggal sa mga kontak!</string>
+    <string name="contact_export_none">Walang kontak na ma-export</string>
+    <string name="contact_export_error">Hindi ma-export ang mga kontak</string>
+    <string name="contact_import_error">Hindi ma-import ang mga kontak</string>
+    <string name="contact_import_success">Na-import na ang %d kontak</string>
+    <string name="contact_import_none">Walang kontak na ma-import</string>
+    <string name="contact_import_warning_header">Babala</string>
+    <string name="contact_import_permission_error">Mangyaring payagan ang Kalium para bumasa galing sa device storage.</string>
+    <string name="contact_export_permission_error">Mangyaring payagan ang Kalium para magsulat sa device storage.</string>
+    <string name="contact_export_success">Ang mga kontak ay nai-save sa %s</string>
+
+    <!-- Push Notifications -->
+    <string name="notifications_settings">Abiso</string>
+    <string name="generic_on">On</string>
+    <string name="generic_off">Off</string>
+    <string name="notification_title">Nakatanggap ng %s BANANO</string>
+    <string name="notification_body">Buksan ang Kalium para tingnan ito.</string>
+    <string name="notificaiton_header_suplement">Tapikin para mabuksan</string>
 
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">I-scan ang Banano \naddress QR code</string>

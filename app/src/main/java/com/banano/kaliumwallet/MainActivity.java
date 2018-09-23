@@ -1,5 +1,6 @@
 package com.banano.kaliumwallet;
 
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,15 +11,6 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.banano.kaliumwallet.model.AvailableLanguage;
-import com.banano.kaliumwallet.model.KaliumWallet;
-import com.hwangjr.rxbus.annotation.Subscribe;
-
-import java.util.Locale;
-import java.util.UUID;
-
-import javax.inject.Inject;
-
 import com.banano.kaliumwallet.bus.Logout;
 import com.banano.kaliumwallet.bus.OpenWebView;
 import com.banano.kaliumwallet.bus.RxBus;
@@ -27,9 +19,14 @@ import com.banano.kaliumwallet.di.activity.ActivityComponent;
 import com.banano.kaliumwallet.di.activity.ActivityModule;
 import com.banano.kaliumwallet.di.activity.DaggerActivityComponent;
 import com.banano.kaliumwallet.di.application.ApplicationComponent;
+import com.banano.kaliumwallet.model.AvailableLanguage;
+import com.banano.kaliumwallet.model.Contact;
 import com.banano.kaliumwallet.model.Credentials;
+import com.banano.kaliumwallet.model.KaliumWallet;
 import com.banano.kaliumwallet.network.AccountService;
+import com.banano.kaliumwallet.ui.common.ActivityFragmentBackButtonInterface;
 import com.banano.kaliumwallet.ui.common.ActivityWithComponent;
+import com.banano.kaliumwallet.ui.common.FragmentOnBackListener;
 import com.banano.kaliumwallet.ui.common.FragmentUtility;
 import com.banano.kaliumwallet.ui.common.WindowControl;
 import com.banano.kaliumwallet.ui.home.HomeFragment;
@@ -37,28 +34,47 @@ import com.banano.kaliumwallet.ui.intro.IntroNewWalletFragment;
 import com.banano.kaliumwallet.ui.intro.IntroWelcomeFragment;
 import com.banano.kaliumwallet.ui.webview.WebViewDialogFragment;
 import com.banano.kaliumwallet.util.SharedPreferencesUtil;
+import com.hwangjr.rxbus.annotation.Subscribe;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.UUID;
+
+import javax.inject.Inject;
+
 import io.realm.Realm;
 import io.realm.RealmResults;
+import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity implements WindowControl, ActivityWithComponent {
-    private FragmentUtility mFragmentUtility;
+public class MainActivity extends AppCompatActivity implements WindowControl, ActivityWithComponent, ActivityFragmentBackButtonInterface {
     protected ActivityComponent mActivityComponent;
+
+    public static boolean appInForeground = false;
+
+    private ArrayList<WeakReference<FragmentOnBackListener>> backClickListenersList = new ArrayList<>();
 
     @Inject
     Realm realm;
-
     @Inject
     AccountService accountService;
-
     @Inject
     KaliumWallet nanoWallet;
-
     @Inject
     SharedPreferencesUtil sharedPreferencesUtil;
+    private FragmentUtility mFragmentUtility;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        appInForeground = true;
+
+        clearNotificationPrefCache();
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
@@ -93,12 +109,51 @@ public class MainActivity extends AppCompatActivity implements WindowControl, Ac
                     getBaseContext().getResources().getDisplayMetrics());
         }
 
+        if (!sharedPreferencesUtil.isDefaultContactAdded()) {
+            realm.executeTransaction(realm -> {
+                Contact newContact = realm.createObject(Contact.class, "ban_1ka1ium4pfue3uxtntqsrib8mumxgazsjf58gidh1xeo5te3whsq8z476goo");
+                newContact.setName("@KaliumDonations");
+                try {
+                    File heisenberg = moveHeisenbergFromAssets();
+                    if (heisenberg != null && heisenberg.exists()) {
+                        newContact.setMonkeyPath(heisenberg.getAbsolutePath());
+                    }
+                } catch (IOException e) {
+                    Timber.e(e);
+                }
+            });
+            sharedPreferencesUtil.setDefaultContactAdded();
+        }
+
         initUi();
+    }
+
+    private File moveHeisenbergFromAssets() throws IOException {
+        File heisenberg = new File(getFilesDir(), "ban_1ka1ium4pfue3uxtntqsrib8mumxgazsjf58gidh1xeo5te3whsq8z476goo.svg");
+        try (InputStream inputStream = getAssets().open("heisenberg.svg");
+             FileOutputStream outputStream = new FileOutputStream(heisenberg)) {
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = inputStream.read(buf)) > 0) {
+                outputStream.write(buf, 0, len);
+            }
+        } catch (IOException e) {
+            throw new IOException("Could not open heisenbergsvg", e);
+        }
+        return heisenberg;
+    }
+
+    private void clearNotificationPrefCache() {
+        SharedPreferences sharedPreferences = getSharedPreferences("NotificationData", 0);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        appInForeground = false;
         // stop websocket on pause
         if (accountService != null) {
             accountService.close();
@@ -108,6 +163,8 @@ public class MainActivity extends AppCompatActivity implements WindowControl, Ac
     @Override
     protected void onResume() {
         super.onResume();
+        appInForeground = true;
+        clearNotificationPrefCache();
         // start websocket on resume
         if (accountService != null && realm != null && !realm.isClosed() && realm.where(Credentials.class).findFirst() != null) {
             accountService.open();
@@ -216,7 +273,6 @@ public class MainActivity extends AppCompatActivity implements WindowControl, Ac
     }
 
 
-
     /**
      * Set the status bar to a particular color
      *
@@ -248,5 +304,41 @@ public class MainActivity extends AppCompatActivity implements WindowControl, Ac
     @Override
     public ApplicationComponent getApplicationComponent() {
         return KaliumApplication.getApplication(this).getApplicationComponent();
+    }
+
+    // Handle fragments overriding back button presses
+    @Override
+    public void addBackClickListener(FragmentOnBackListener onBackClickListener) {
+        backClickListenersList.add(new WeakReference<>(onBackClickListener));
+    }
+
+    @Override
+    public void removeBackClickListener(FragmentOnBackListener onBackClickListener) {
+        for (Iterator<WeakReference<FragmentOnBackListener>> iterator = backClickListenersList.iterator();
+             iterator.hasNext();){
+            WeakReference<FragmentOnBackListener> weakRef = iterator.next();
+            if (weakRef.get() == onBackClickListener){
+                iterator.remove();
+            }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(!fragmentsBackKeyIntercept()){
+            super.onBackPressed();
+        }
+    }
+
+    private boolean fragmentsBackKeyIntercept() {
+        boolean isIntercept = false;
+        for (WeakReference<FragmentOnBackListener> weakRef : backClickListenersList) {
+            FragmentOnBackListener onBackClickListener = weakRef.get();
+            if (onBackClickListener != null) {
+                boolean isFragmIntercept = onBackClickListener.onBackClick();
+                if (!isIntercept) isIntercept = isFragmIntercept;
+            }
+        }
+        return isIntercept;
     }
 }

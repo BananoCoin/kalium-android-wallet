@@ -108,9 +108,9 @@
     <string name="send_sending">Miktar:</string>
     <string name="send_to">Adres:</string>
     <string name="sent_to">Alıcı:</string>
-    <string name="send_confirm">Onayla</string>
-    <string name="send_cancel">İptal</string>
-    <string name="send_close">Kapat</string>
+    <string name="dialog_confirm">Onayla</string>
+    <string name="dialog_cancel">İptal</string>
+    <string name="dialog_close">Kapat</string>
     <string name="send_alert_dialog_ok">Tamam</string>
     <string name="send_alert_dialog_title">Geçersiz Girdi</string>
     <string name="send_invalid_address">Geçersiz bir adres girdiniz</string>
@@ -123,6 +123,45 @@
     <string name="send_fingerprint_description">%s Banano göndermek için parmak izi onayla</string>
     <string name="send_pin_description">%s Banano gönder?</string>
 
+    <!-- Address Book/Contacts -->
+    <string name="contact_add">Kişi Ekle</string>
+    <string name="contact_added">%s rehbere eklendi!</string>
+    <string name="contact_invalid_name">Geçersiz isim</string>
+    <!-- Add Contact Dialog -->
+    <string name="contact_add_header">Kişi Ekle:</string>
+    <string name="contact_add_button">Kişi Ekle</string>
+    <string name="contact_name_hint">Bir İsim Girin @</string>
+    <string name="contact_name_missing">Bu kişiye bir isim verin</string>
+    <string name="contact_name_exists">Bu kişi zaten mevcut</string>
+    <string name="contact_address_hint">Bir Adres Girin</string>
+    <string name="contact_address_exists">Bu adrese sahip bir kişi zaten mevcut</string>
+    <!-- Contacts Settings -->
+    <string name="contact_header">Rehber</string>
+    <string name="contact_settings_item">Rehber</string>
+    <!-- Contact Detail -->
+    <string name="contact_view_header">Kişi:</string>
+    <string name="contact_remove_header">Sil:</string>
+    <string name="contact_remove_btn">Kişiyi Sil</string>
+    <string name="contact_remove_sure">%s kişisini silmek istediğine emin misin?</string>
+    <!-- Export/Import -->
+    <string name="contact_removed">%s rehberden silindi!</string>
+    <string name="contact_export_none">Dışa aktarılabilecek bir kişi bulunamadı</string>
+    <string name="contact_export_error">Rehberi dışa aktarmada sorun oluştu</string>
+    <string name="contact_import_error">Rehberi içe aktarmada sorun oluştu</string>
+    <string name="contact_import_success">%d kişi içe aktarıldı</string>
+    <string name="contact_import_none">İçe aktarılacak bir kişi bulunamadı</string>
+    <string name="contact_import_warning_header">Uyarı</string>
+    <string name="contact_import_permission_error">Lütfen Kalium\'a cihaza yazma izni ver.</string>
+    <string name="contact_export_permission_error">Lütfen Kalium\'a cihazdan okuma izni ver.</string>
+    <string name="contact_export_success">Rehber şuraya kaydedildi: %s</string>
+
+    <!-- Push Notifications -->
+    <string name="notifications_settings">Bildirimler</string>
+    <string name="generic_on">Açık</string>
+    <string name="generic_off">Kapalı</string>
+    <string name="notification_title">%s BANANO Alındı</string>
+    <string name="notification_body">Bu transferi görmek için Kalium’u aç.</string>
+    <string name="notificaiton_header_suplement">Açmak için dokun</string>
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">Banano Adresi\'nin \n QR Kodu\'nu tarayın</string>
 </resources>

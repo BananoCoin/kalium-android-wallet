@@ -22,14 +22,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.banano.kaliumwallet.ui.common.SwipeDismissTouchListener;
-import com.github.sumimakito.awesomeqr.AwesomeQRCode;
-
-import java.io.File;
-import java.io.FileOutputStream;
-
-import javax.inject.Inject;
-
 import com.banano.kaliumwallet.R;
 import com.banano.kaliumwallet.broadcastreceiver.ClipboardAlarmReceiver;
 import com.banano.kaliumwallet.databinding.FragmentReceiveBinding;
@@ -37,7 +29,14 @@ import com.banano.kaliumwallet.model.Address;
 import com.banano.kaliumwallet.model.Credentials;
 import com.banano.kaliumwallet.ui.common.ActivityWithComponent;
 import com.banano.kaliumwallet.ui.common.BaseDialogFragment;
+import com.banano.kaliumwallet.ui.common.SwipeDismissTouchListener;
 import com.banano.kaliumwallet.ui.common.UIUtil;
+import com.github.sumimakito.awesomeqr.AwesomeQRCode;
+
+import java.io.File;
+import java.io.FileOutputStream;
+
+import javax.inject.Inject;
 
 import io.realm.Realm;
 
@@ -45,18 +44,17 @@ import io.realm.Realm;
  * Receive main screen
  */
 public class ReceiveDialogFragment extends BaseDialogFragment {
-    private FragmentReceiveBinding binding;
-    public static String TAG = ReceiveDialogFragment.class.getSimpleName();
     private static final int QRCODE_SIZE = 240;
     private static final String TEMP_FILE_NAME = "bananoreceive.png";
+    public static String TAG = ReceiveDialogFragment.class.getSimpleName();
+    @Inject
+    Realm realm;
+    private FragmentReceiveBinding binding;
     private Address address;
     private String fileName;
     private Runnable mRunnable;
     private Handler mHandler;
     private boolean copyRunning = false;
-
-    @Inject
-    Realm realm;
 
     /**
      * Create new instance of the dialog fragment (handy pattern if any data needs to be passed to it)
@@ -127,7 +125,8 @@ public class ReceiveDialogFragment extends BaseDialogFragment {
             }
 
             @Override
-            public void onTap(View view) { }
+            public void onTap(View view) {
+            }
         }, SwipeDismissTouchListener.TOP_TO_BOTTOM));
 
         // colorize address text
@@ -143,14 +142,14 @@ public class ReceiveDialogFragment extends BaseDialogFragment {
 
         // Tweak layout for shorter devices
         DisplayMetrics metrics = getResources().getDisplayMetrics();
-        float ratio = ((float)metrics.heightPixels / (float)metrics.widthPixels);
+        float ratio = ((float) metrics.heightPixels / (float) metrics.widthPixels);
         if (ratio < 1.8) {
-            binding.receiveOuter.getLayoutParams().height = (int)UIUtil.convertDpToPixel(260, getContext());
-            binding.receiveOuter.getLayoutParams().width = (int)UIUtil.convertDpToPixel(260, getContext());
-            binding.receiveBarcode.getLayoutParams().height = (int)UIUtil.convertDpToPixel(125, getContext());
-            binding.receiveBarcode.getLayoutParams().width = (int)UIUtil.convertDpToPixel(125, getContext());
-            ViewGroup.MarginLayoutParams barcodeMargin = (ViewGroup.MarginLayoutParams)binding.receiveBarcode.getLayoutParams();
-            barcodeMargin.topMargin = (int)UIUtil.convertDpToPixel(33, getContext());
+            binding.receiveOuter.getLayoutParams().height = (int) UIUtil.convertDpToPixel(260, getContext());
+            binding.receiveOuter.getLayoutParams().width = (int) UIUtil.convertDpToPixel(260, getContext());
+            binding.receiveBarcode.getLayoutParams().height = (int) UIUtil.convertDpToPixel(125, getContext());
+            binding.receiveBarcode.getLayoutParams().width = (int) UIUtil.convertDpToPixel(125, getContext());
+            ViewGroup.MarginLayoutParams barcodeMargin = (ViewGroup.MarginLayoutParams) binding.receiveBarcode.getLayoutParams();
+            barcodeMargin.topMargin = (int) UIUtil.convertDpToPixel(33, getContext());
             binding.receiveBarcode.setLayoutParams(barcodeMargin);
         }
 
@@ -170,7 +169,6 @@ public class ReceiveDialogFragment extends BaseDialogFragment {
                     public void onRendered(AwesomeQRCode.Renderer renderer, final Bitmap bitmap) {
                         getActivity().runOnUiThread(() -> {
                             binding.receiveBarcode.setImageBitmap(bitmap);
-                            binding.receiveCard.receiveCardQrBg.setBackground(qrBackground);
                             binding.receiveCard.cardBarcodeImg.setImageBitmap(bitmap);
                         });
                     }
@@ -196,7 +194,7 @@ public class ReceiveDialogFragment extends BaseDialogFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (mHandler != null  && mRunnable != null) {
+        if (mHandler != null && mRunnable != null) {
             mHandler.removeCallbacks(mRunnable);
         }
     }
@@ -211,54 +209,9 @@ public class ReceiveDialogFragment extends BaseDialogFragment {
         }
     }
 
-    private Bitmap trimBitmap(Bitmap source) {
-        int firstX = 0, firstY = 0;
-        int lastX = source.getWidth();
-        int lastY = source.getHeight();
-        int[] pixels = new int[source.getWidth() * source.getHeight()];
-        source.getPixels(pixels, 0, source.getWidth(), 0, 0, source.getWidth(), source.getHeight());
-        loop:
-        for (int x = 0; x < source.getWidth(); x++) {
-            for (int y = 0; y < source.getHeight(); y++) {
-                if (pixels[x + (y * source.getWidth())] != Color.TRANSPARENT) {
-                    firstX = x;
-                    break loop;
-                }
-            }
-        }
-        loop:
-        for (int y = 0; y < source.getHeight(); y++) {
-            for (int x = firstX; x < source.getWidth(); x++) {
-                if (pixels[x + (y * source.getWidth())] != Color.TRANSPARENT) {
-                    firstY = y;
-                    break loop;
-                }
-            }
-        }
-        loop:
-        for (int x = source.getWidth() - 1; x >= firstX; x--) {
-            for (int y = source.getHeight() - 1; y >= firstY; y--) {
-                if (pixels[x + (y * source.getWidth())] != Color.TRANSPARENT) {
-                    lastX = x;
-                    break loop;
-                }
-            }
-        }
-        loop:
-        for (int y = source.getHeight() - 1; y >= firstY; y--) {
-            for (int x = source.getWidth() - 1; x >= firstX; x--) {
-                if (pixels[x + (y * source.getWidth())] != Color.TRANSPARENT) {
-                    lastY = y;
-                    break loop;
-                }
-            }
-        }
-        return Bitmap.createBitmap(source, firstX, firstY, lastX - firstX, lastY - firstY);
-    }
-
     public Bitmap setViewToBitmapImage(View view) {
         //Define a bitmap with the same size as the view
-        Bitmap returnedBitmap = Bitmap.createBitmap(1230, 609, Bitmap.Config.ARGB_8888);
+        Bitmap returnedBitmap = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
         //Bind a canvas to it
         Canvas canvas = new Canvas(returnedBitmap);
         //Get the view's background
@@ -273,7 +226,7 @@ public class ReceiveDialogFragment extends BaseDialogFragment {
         // draw the view on the canvas
         view.draw(canvas);
         //return the bitmap
-        return trimBitmap(returnedBitmap);
+        return returnedBitmap;
     }
 
     public void saveImage(Bitmap finalBitmap) {

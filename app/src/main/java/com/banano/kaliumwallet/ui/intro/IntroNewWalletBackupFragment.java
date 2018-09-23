@@ -2,22 +2,23 @@ package com.banano.kaliumwallet.ui.intro;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.banano.kaliumwallet.R;
 import com.banano.kaliumwallet.bus.CreatePin;
 import com.banano.kaliumwallet.bus.RxBus;
 import com.banano.kaliumwallet.databinding.FragmentIntroNewWalletSeedBackupBinding;
-
-import com.banano.kaliumwallet.R;
 import com.banano.kaliumwallet.model.Credentials;
 import com.banano.kaliumwallet.ui.common.ActivityWithComponent;
 import com.banano.kaliumwallet.ui.common.BaseFragment;
 import com.banano.kaliumwallet.ui.common.FragmentUtility;
 import com.banano.kaliumwallet.ui.common.WindowControl;
 import com.banano.kaliumwallet.ui.home.HomeFragment;
+import com.banano.kaliumwallet.ui.pin.CreatePinDialogFragment;
 import com.banano.kaliumwallet.util.ExceptionHandler;
 import com.banano.kaliumwallet.util.SharedPreferencesUtil;
 import com.hwangjr.rxbus.annotation.Subscribe;
@@ -31,9 +32,8 @@ import io.realm.Realm;
  */
 
 public class IntroNewWalletBackupFragment extends BaseFragment {
-    FragmentIntroNewWalletSeedBackupBinding binding;
     public static String TAG = IntroNewWalletBackupFragment.class.getSimpleName();
-
+    FragmentIntroNewWalletSeedBackupBinding binding;
     @Inject
     Realm realm;
 
@@ -94,12 +94,12 @@ public class IntroNewWalletBackupFragment extends BaseFragment {
 
     @Subscribe
     public void receiveCreatePin(CreatePin pinComplete) {
-        realm.beginTransaction();
-        Credentials credentials = realm.where(Credentials.class).findFirst();
-        if (credentials != null) {
-            credentials.setPin(pinComplete.getPin());
-        }
-        realm.commitTransaction();
+        realm.executeTransaction(realm -> {
+            Credentials credentials = realm.where(Credentials.class).findFirst();
+            if (credentials != null) {
+                credentials.setPin(pinComplete.getPin());
+            }
+        });
         goToHomeScreen();
     }
 
@@ -149,6 +149,11 @@ public class IntroNewWalletBackupFragment extends BaseFragment {
         }
 
         public void onClickYes(View v) {
+            // Don't do anything if pin screen is visible
+            Fragment createPinFragment = ((WindowControl) getActivity()).getFragmentUtility().getFragmentManager().findFragmentByTag(CreatePinDialogFragment.TAG);
+            if (createPinFragment != null) {
+                return;
+            }
             Credentials credentials = realm.where(Credentials.class).findFirst();
             if (credentials != null) {
                 if (credentials.getPin() == null) {
