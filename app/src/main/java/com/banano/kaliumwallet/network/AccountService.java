@@ -71,7 +71,7 @@ import timber.log.Timber;
  */
 
 public class AccountService {
-    public static final int TIMEOUT_MILLISECONDS = 5000;
+    public static final int TIMEOUT_MILLISECONDS = 8000;
     @Inject
     SharedPreferencesUtil sharedPreferencesUtil;
     @Inject
@@ -118,7 +118,13 @@ public class AccountService {
      */
     private void initWebSocket() {
         // create websocket
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
+        clientBuilder.readTimeout(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
+        clientBuilder.writeTimeout(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
+        clientBuilder.pingInterval(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
+        clientBuilder.connectTimeout(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
+        clientBuilder.retryOnConnectionFailure(true);
+        OkHttpClient client = clientBuilder.build();
 
         Request request = new Request.Builder()
                 .url(BuildConfig.CONNECTION_URL)
@@ -544,16 +550,16 @@ public class AccountService {
 
                     if (((Block) requestItem.getRequest()).getWork() == null) {
                         ExceptionHandler.handle(new Exception("Work request failed."));
-                        requestQueue.poll();
-                        processQueue();
+                        requestQueue.clear();
+                        post(new SocketError(new Throwable()));
                     } else if ((requestItem.getRequest() instanceof StateBlock) &&
                             (((Block) requestItem.getRequest()).getInternal_block_type() == BlockTypes.SEND ||
                                     ((Block) requestItem.getRequest()).getInternal_block_type() == BlockTypes.RECEIVE ||
                                     ((Block) requestItem.getRequest()).getInternal_block_type() == BlockTypes.CHANGE) &&
                             ((StateBlock) requestItem.getRequest()).getBalance() == null) {
                         ExceptionHandler.handle(new Exception("Head block request failed."));
-                        requestQueue.poll();
-                        processQueue();
+                        requestQueue.clear();
+                        post(new SocketError(new Throwable()));
                     } else {
                         websocket.send(gson.toJson(new ProcessRequest(block)));
                     }
