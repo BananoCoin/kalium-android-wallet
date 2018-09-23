@@ -115,7 +115,6 @@
     <string name="send_amount_hint">금액을 입력하세요</string>
     <string name="send_max">최대</string>
     <string name="send_send_cta">전송</string>
-    <string name="send_balance">(%s BAN)</string>
     <string name="send_sent">전송됨</string>
     <string name="send_scan_qr">QR 코드를 스캔하세요</string>
     <string name="send_sending">전송중</string>
