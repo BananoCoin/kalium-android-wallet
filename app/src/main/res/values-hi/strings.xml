@@ -46,7 +46,7 @@
     <string name="settings_title">सेटिंग्स </string>
     <string name="settings_local_currency">मुद्रा (करेंसी) बदलें</string>
     <string name="settings_change_language">भाषा</string>
-    <string name="settings_default_language_string">प्रणालीगत चूक</string>
+    <string name="settings_default_language_string">डिवाइस की भाषा</string>
     <string name="settings_backup_seed">बीज (सीड) बैकअप करें</string>
     <string name="settings_change_rep">प्रतिनिधि (रिप्रेजेन्टेटिव) बदलें</string>
     <string name="settings_share">केलियम साझा (शेयर) करें</string>
@@ -77,6 +77,8 @@
     <string name="change_representative_hint">नए प्रतिनिधि का पता दर्ज करें</string>
     <string name="change_representative_success">प्रतिनिधि (रिप्रेजेन्टेटिव) सफलतापूर्वक बदल गया</string>
     <string name="change_representative_error">प्रतिनिधि (रिप्रेजेन्टेटिव) बदलने में असफल। बाद में फिर से प्रयास करें।</string>
+	<string name="change_representative_fingerprint">उंगली के निशान की सहायता से प्रतिनिधि बदलें</string>
+    <string name="change_representative_pin">प्रतिनिधि बदलने के लिए पिन दर्ज करें</string>
     <!-- Share -->
     <string name="share_title">इस माध्यम से साझा (शेयर) करें - </string>
     <string name="share_extra">केलियम - बनानो का एंड्रॉइड वॉलेट देखें!</string>
