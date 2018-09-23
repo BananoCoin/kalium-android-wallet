@@ -544,16 +544,16 @@ public class AccountService {
 
                     if (((Block) requestItem.getRequest()).getWork() == null) {
                         ExceptionHandler.handle(new Exception("Work request failed."));
-                        requestQueue.poll();
-                        processQueue();
+                        requestQueue.clear();
+                        post(new SocketError(new Throwable()));
                     } else if ((requestItem.getRequest() instanceof StateBlock) &&
                             (((Block) requestItem.getRequest()).getInternal_block_type() == BlockTypes.SEND ||
                                     ((Block) requestItem.getRequest()).getInternal_block_type() == BlockTypes.RECEIVE ||
                                     ((Block) requestItem.getRequest()).getInternal_block_type() == BlockTypes.CHANGE) &&
                             ((StateBlock) requestItem.getRequest()).getBalance() == null) {
                         ExceptionHandler.handle(new Exception("Head block request failed."));
-                        requestQueue.poll();
-                        processQueue();
+                        requestQueue.clear();
+                        post(new SocketError(new Throwable()));
                     } else {
                         websocket.send(gson.toJson(new ProcessRequest(block)));
                     }
