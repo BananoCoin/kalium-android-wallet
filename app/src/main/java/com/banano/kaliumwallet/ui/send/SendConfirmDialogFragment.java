@@ -256,7 +256,7 @@ public class SendConfirmDialogFragment extends BaseDialogFragment {
      */
     @Subscribe
     public void receiveSocketError(SocketError socketError) {
-        if (retryCount > 2) {
+        if (retryCount > 1) {
             hideLoadingOverlay();
             if (mTargetFragment != null) {
                 mTargetFragment.onActivityResult(getTargetRequestCode(), SEND_FAILED, mActivity.getIntent());
