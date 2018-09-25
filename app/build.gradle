@@ -11,8 +11,8 @@ android {
         applicationId "com.banano.kaliumwallet"
         minSdkVersion 17
         targetSdkVersion 28
-        versionCode 25
-        versionName "1.0.1"
+        versionCode 26
+        versionName "1.0.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
@@ -57,13 +57,14 @@ dependencies {
     final FINGERPRINT_VERSION = '3.2.1'
     final GLIDE_VERSION = '4.8.0'
     final GSON_FIRE_VERSION = '1.8.2'
-    final GSON_VERSION = '2.8.2'
+    final GSON_VERSION = '2.8.5'
+    final JAVA_WS_VERSION = '1.3.9'
     final J_UNIT_VERSION = '4.12'
     final LOTTIE_VERSION = '2.6.0-beta19'
     final PINLOCKVIEW_VERSION = '2.1.0'
     final RX_ANDROID = '2.0.2'
     final RXBUS_VERSION = '2.0.0'
-    final RX_JAVA_2 = '2.1.8'
+    final RX_JAVA_2 = '2.2.2'
     final SUPPORT_LIBRARY_VERSION = '28.0.0-rc02'
     final TEST_RUNNER_VERSION = '1.0.1'
     final TIMBER_VERSION = '4.7.0'
@@ -103,6 +104,7 @@ dependencies {
 
     // WebSocket
     implementation "com.squareup.okhttp3:okhttp:$OKHTTP_VERSION"
+    implementation "org.java-websocket:Java-WebSocket:$JAVA_WS_VERSION"
 
     // SVG
     implementation "com.caverock:androidsvg-aar:$ANDROID_SVG_VERSION"

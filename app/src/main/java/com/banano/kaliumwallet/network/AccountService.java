@@ -44,13 +44,17 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.internal.LinkedTreeMap;
 
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
+
 import java.math.BigInteger;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -59,11 +63,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import io.realm.Realm;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.WebSocket;
-import okhttp3.WebSocketListener;
 import timber.log.Timber;
 
 /**
@@ -83,8 +82,7 @@ public class AccountService {
     @Inject
     @Named("encryption_key")
     byte[] encryption_key;
-    private WebSocket websocket;
-    private boolean connected = false;
+    private WebSocketClient websocket;
     private LinkedList<RequestItem> requestQueue = new LinkedList<>();
     private String private_key;
     private Address address;
@@ -103,62 +101,57 @@ public class AccountService {
     public void open() {
         wallet.setBlockCount(-1);
 
-        // initialize the web socket
-        if (!connected) {
-            initWebSocket();
-        }
-
         private_key = getPrivateKey();
         address = getAddress();
         wallet.setPublicKey(getPublicKey());
+
+        // initialize the web socket
+        if (wsDisconnected()) {
+            initWebSocket();
+        } else {
+            requestUpdate();
+        }
     }
 
     /**
      * Initialize websocket and event listeners
      */
     private void initWebSocket() {
+        if (websocket != null && !websocket.isOpen()) {
+            try {
+                websocket.reconnectBlocking();
+                processQueue();
+                return;
+            }catch (InterruptedException e) {
+                Timber.e(e);
+                return;
+            }
+        }
         // create websocket
-        OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
-        clientBuilder.readTimeout(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
-        clientBuilder.writeTimeout(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
-        clientBuilder.pingInterval(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
-        clientBuilder.connectTimeout(TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS);
-        clientBuilder.retryOnConnectionFailure(true);
-        OkHttpClient client = clientBuilder.build();
-
-        Request request = new Request.Builder()
-                .url(BuildConfig.CONNECTION_URL)
-                .addHeader("X-Client-Version", Integer.toString(BuildConfig.VERSION_CODE))
-                .build();
-
-        WebSocketListener listener = new WebSocketListener() {
+        URI wssUri;
+        try {
+            wssUri = new URI(BuildConfig.CONNECTION_URL);
+        } catch (URISyntaxException use) {
+            Timber.e(use);
+            return;
+        }
+        Map<String, String> httpHeaders = new HashMap<>();
+        httpHeaders.put("X-Client-Version", Integer.toString(BuildConfig.VERSION_CODE));
+        websocket = new WebSocketClient(wssUri, httpHeaders) {
             @Override
-            public void onOpen(WebSocket webSocket, Response response) {
-                super.onOpen(webSocket, response);
-                if (response.code() == 101) {
-                    Timber.d("OPENED");
-                    connected = true;
-                    requestUpdate();
-                }
+            public void onOpen(ServerHandshake handshakedata) {
+                Timber.d("OPENED");
+                requestUpdate();
             }
 
             @Override
-            public void onMessage(WebSocket webSocket, String text) {
-                super.onMessage(webSocket, text);
-                Timber.d("RECEIVED %s", text);
-                handleMessage(text);
+            public void onMessage(String message) {
+                Timber.d("RECEIVED %s", message);
+                handleMessage(message);
             }
 
             @Override
-            public void onClosing(WebSocket webSocket, int code, String reason) {
-                super.onClosing(webSocket, code, reason);
-                Timber.d("CLOSING");
-            }
-
-            @Override
-            public void onClosed(WebSocket webSocket, int code, String reason) {
-                super.onClosed(webSocket, code, reason);
-                connected = false;
+            public void onClose(int code, String reason, boolean remote) {
                 switch (code) {
                     case 1000: // CLOSE_NORMAL
                         Timber.d("CLOSED");
@@ -170,30 +163,25 @@ public class AccountService {
             }
 
             @Override
-            public void onFailure(WebSocket webSocket, Throwable t, @Nullable Response response) {
-                super.onFailure(webSocket, t, response);
-                ExceptionHandler.handle(t);
-                if (connected && (t instanceof SocketTimeoutException ||
-                        t instanceof UnknownHostException)) {
-                    close();
-                    checkState();
-                }
-                if (!connected) {
-                    post(new SocketError(t));
+            public void onError(Exception ex) {
+                ExceptionHandler.handle(ex);
+                if (websocket.isClosing() || websocket.isClosed()) {
+                    post(new SocketError(ex));
                     if (requestQueue != null) {
                         requestQueue.clear();
                     }
+                    checkState();
                 }
             }
         };
-
+        websocket.setConnectionLostTimeout(5);
         // create websocket with listeners
-        websocket = client.newWebSocket(request, listener);
-
-        // trigger shutdown of the dispatcher's executor so this process can exit cleanly.
-        client.dispatcher().executorService().shutdown();
-
-        processQueue();
+        try {
+            websocket.connectBlocking();
+            processQueue();
+        } catch (InterruptedException e) {
+            Timber.e(e);
+        }
     }
 
     /**
@@ -545,7 +533,6 @@ public class AccountService {
                     // escape the block to match https://github.com/clemahieu/raiblocks/wiki/RPC-protocol#process-block
                     String block = gson.toJson(requestItem.getRequest());
 
-                    checkState();
                     Timber.d("SEND: %s", gson.toJson(new ProcessRequest(block)));
 
                     if (((Block) requestItem.getRequest()).getWork() == null) {
@@ -561,12 +548,11 @@ public class AccountService {
                         requestQueue.clear();
                         post(new SocketError(new Throwable()));
                     } else {
-                        websocket.send(gson.toJson(new ProcessRequest(block)));
+                        wsSend(gson.toJson(new ProcessRequest(block)));
                     }
                 } else {
-                    checkState();
                     Timber.d("SEND: %s", gson.toJson(requestItem.getRequest()));
-                    websocket.send(gson.toJson(requestItem.getRequest()));
+                    wsSend(gson.toJson(requestItem.getRequest()));
                 }
             } else if (requestItem != null && (requestItem.isProcessing() && System.currentTimeMillis() > requestItem.getExpireTime())) {
                 // expired request on the queue so remove and go to the next
@@ -878,21 +864,30 @@ public class AccountService {
      * Close the web socket
      */
     public void close() {
-        if (!connected) {
+        if (wsDisconnected()) {
             return;
         }
         try {
             websocket.close(1000, "Closed");
-            connected = false;
-        } catch (IllegalStateException e) {
-            connected = false;
+        } catch (Exception e) {
             ExceptionHandler.handle(e);
         }
     }
 
+    private boolean wsDisconnected() {
+        return websocket == null || websocket.isClosing() || websocket.isClosed() || !websocket.isOpen();
+    }
+
     private void checkState() {
-        if (!connected) {
+        if (wsDisconnected()) {
             initWebSocket();
+        }
+    }
+
+    private void wsSend(String message) {
+        checkState();
+        if (websocket.isOpen()) {
+            websocket.send(message);
         }
     }
 }
