@@ -242,6 +242,9 @@ public class SendConfirmDialogFragment extends BaseDialogFragment {
      */
     @Subscribe
     public void receiveServiceError(ErrorResponse errorResponse) {
+        if (errorResponse.getError().toLowerCase().equals("Unreceivable")) {
+            return;
+        }
         hideLoadingOverlay();
         if (mTargetFragment != null) {
             mTargetFragment.onActivityResult(getTargetRequestCode(), SEND_FAILED, mActivity.getIntent());
