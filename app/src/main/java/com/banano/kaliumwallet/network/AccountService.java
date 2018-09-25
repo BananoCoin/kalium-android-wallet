@@ -117,16 +117,6 @@ public class AccountService {
      * Initialize websocket and event listeners
      */
     private void initWebSocket() {
-        if (websocket != null && !websocket.isOpen()) {
-            try {
-                websocket.reconnectBlocking();
-                processQueue();
-                return;
-            }catch (InterruptedException e) {
-                Timber.e(e);
-                return;
-            }
-        }
         // create websocket
         URI wssUri;
         try {
@@ -157,7 +147,6 @@ public class AccountService {
                         Timber.d("CLOSED");
                         break;
                     default: // Abnormal closure
-                        checkState();
                         break;
                 }
             }
