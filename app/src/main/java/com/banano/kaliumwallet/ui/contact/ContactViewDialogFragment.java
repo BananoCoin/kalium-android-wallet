@@ -33,6 +33,7 @@ import com.banano.kaliumwallet.ui.common.SwipeDismissTouchListener;
 import com.banano.kaliumwallet.ui.common.UIUtil;
 import com.banano.kaliumwallet.ui.common.WindowControl;
 import com.banano.kaliumwallet.ui.send.SendDialogFragment;
+import com.banano.kaliumwallet.ui.webview.WebViewDialogFragment;
 import com.banano.kaliumwallet.util.svg.SvgSoftwareLayerSetter;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
@@ -243,6 +244,17 @@ public class ContactViewDialogFragment extends BaseDialogFragment {
                         // do nothing which dismisses the dialog
                     })
                     .show();
+        }
+
+        public void onClickSearch(View v) {
+            if (getActivity() instanceof WindowControl) {
+                // show webview dialog
+                WebViewDialogFragment dialog = WebViewDialogFragment.newInstance(getString(R.string.account_explore_url, binding.contactAddress.getText()), "");
+                dialog.show(((WindowControl) getActivity()).getFragmentUtility().getFragmentManager(),
+                        WebViewDialogFragment.TAG);
+
+                ((WindowControl) getActivity()).getFragmentUtility().getFragmentManager().executePendingTransactions();
+            }
         }
 
         public void onClickAddress(View v) {

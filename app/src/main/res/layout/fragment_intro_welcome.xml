@@ -12,34 +12,35 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/gray_dark"
-        android:paddingLeft="30dp"
-        android:paddingRight="30dp">
+        android:background="@color/gray_dark">
 
-        <android.support.v7.widget.AppCompatImageView
-            android:id="@+id/intro_welcome_logo"
-            android:layout_width="160dp"
-            android:layout_height="80dp"
-            android:contentDescription="@string/app_name"
-            app:layout_constraintBottom_toTopOf="@+id/intro_welcome_title"
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/welcome_animation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="centerInside"
             app:layout_constraintEnd_toStartOf="@+id/intro_welcome_guideline_vert"
             app:layout_constraintStart_toStartOf="@+id/intro_welcome_guideline_vert"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed"
-            app:srcCompat="@drawable/ic_logo" />
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/welcome_animation" />
+
 
         <TextView
             android:id="@+id/intro_welcome_title"
             style="@style/TextStyleParagraph"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="44dp"
-            android:gravity="left"
+            android:layout_marginTop="15dp"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
+            android:gravity="center"
             android:text="@string/intro_welcome_title"
-            app:layout_constraintBottom_toTopOf="@+id/intro_welcome_button_new_wallet"
             app:layout_constraintEnd_toStartOf="@+id/intro_welcome_guideline_vert"
             app:layout_constraintStart_toStartOf="@+id/intro_welcome_guideline_vert"
-            app:layout_constraintTop_toBottomOf="@+id/intro_welcome_logo"
+            app:layout_constraintTop_toBottomOf="@+id/welcome_animation"
             app:layout_constraintVertical_chainStyle="packed" />
 
         <Button
@@ -48,6 +49,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
             android:gravity="center"
             android:onClick="@{handlers::onClickNewWallet}"
             android:paddingStart="20dp"
@@ -62,6 +65,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
             android:gravity="center"
             android:onClick="@{handlers::onClickHaveWallet}"
             android:paddingStart="20dp"
