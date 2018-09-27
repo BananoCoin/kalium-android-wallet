@@ -154,6 +154,14 @@
     <string name="contact_export_permission_error">Vui lòng cho phép Kalium ghi vào bộ nhớ của thiết bị.</string>
     <string name="contact_export_success">Danh bạ đã được lưu vào %s</string>
 
+    <!-- Push Notifications -->
+    <string name="notifications_settings">Thông báo</string>
+    <string name="generic_on">Bật</string>
+    <string name="generic_off">Tắt</string>
+    <string name="notification_title">Đã nhận được %s BANANO</string>
+    <string name="notification_body">Mở Kalium để xem giao dịch này.</string>
+    <string name="notificaiton_header_suplement">Chạm vào để mở</string>
+
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">Quét 1 Banano \nđịa chỉ mã QR</string>
 </resources>

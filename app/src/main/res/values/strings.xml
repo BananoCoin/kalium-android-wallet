@@ -8,6 +8,7 @@
     <string name="dialog_close">Close</string>
     <string name="dialog_confirm">Confirm</string>
 
+    <string name="privacy_policy_url" translatable="false">https://bananocoin.github.io/kalium/privacy.html</string>
     <!-- API -->
     <string name="monkey_api_url" translatable="false">https://bananomonkeys.herokuapp.com/image?address=%s</string>
     <!-- Intro Welcome Screen -->
@@ -42,6 +43,7 @@
     <string name="home_send_cta">Send</string>
     <string name="home_receive_cta">Receive</string>
     <string name="home_explore_url" translatable="false">https://creeper.banano.cc/explorer/block/%s</string>
+    <string name="account_explore_url" translatable="false">https://creeper.banano.cc/explorer/account/%s</string>
     <string name="error_message">There was a problem connecting. Please try again.</string>
     <string name="transaction_header">Transactions</string>
     <string name="history_sent">Sent</string>
@@ -76,6 +78,7 @@
     <string name="settings_disable_fingerprint">Authentication Method</string>
     <string name="settings_fingerprint_method">Fingerprint</string>
     <string name="settings_pin_method">PIN</string>
+    <string name="settings_privacy_policy"><u>Privacy Policy</u></string>
     <!-- Change Rep -->
     <string name="change_representative_header">Change\nRepresentative</string>
     <string name="change_representative_header_short">Change</string>
@@ -115,7 +118,7 @@
     <string name="send_amount_hint">Enter Amount</string>
     <string name="send_max">Max</string>
     <string name="send_send_cta">Send</string>
-    <string name="send_balance">(%s BAN)</string>
+    <string name="send_balance" translatable="false">(%s BAN)</string>
     <string name="send_sent">Sent</string>
     <string name="send_scan_qr">Scan QR Code</string>
     <string name="send_sending">Sending</string>

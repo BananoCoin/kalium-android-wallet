@@ -26,6 +26,7 @@ import com.banano.kaliumwallet.bus.CreatePin;
 import com.banano.kaliumwallet.bus.PinComplete;
 import com.banano.kaliumwallet.bus.RxBus;
 import com.banano.kaliumwallet.bus.SendInvalidAmount;
+import com.banano.kaliumwallet.bus.SocketError;
 import com.banano.kaliumwallet.databinding.FragmentSendConfirmBinding;
 import com.banano.kaliumwallet.model.Address;
 import com.banano.kaliumwallet.model.AuthMethod;
@@ -70,6 +71,7 @@ public class SendConfirmDialogFragment extends BaseDialogFragment {
     private AlertDialog fingerprintDialog;
     private Activity mActivity;
     private Fragment mTargetFragment;
+    private int retryCount = 0;
 
     /**
      * Create new instance of the dialog fragment (handy pattern if any data needs to be passed to it)
@@ -95,6 +97,7 @@ public class SendConfirmDialogFragment extends BaseDialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // init dependency injection
+        retryCount = 0;
         mActivity = getActivity();
         mTargetFragment = getTargetFragment();
         if (mActivity instanceof ActivityWithComponent) {
@@ -211,6 +214,7 @@ public class SendConfirmDialogFragment extends BaseDialogFragment {
     }
 
     private void executeSend() {
+        retryCount++;
         showLoadingOverlay();
         BigInteger sendAmount = NumberUtil.getAmountAsRawBigInteger(wallet.getSendBananoAmount());
 
@@ -238,11 +242,32 @@ public class SendConfirmDialogFragment extends BaseDialogFragment {
      */
     @Subscribe
     public void receiveServiceError(ErrorResponse errorResponse) {
+        if (errorResponse.getError().toLowerCase().equals("Unreceivable")) {
+            return;
+        }
         hideLoadingOverlay();
         if (mTargetFragment != null) {
             mTargetFragment.onActivityResult(getTargetRequestCode(), SEND_FAILED, mActivity.getIntent());
         }
         dismiss();
+    }
+
+    /**
+     * Catch service error
+     *
+     * @param socketError Socket error event
+     */
+    @Subscribe
+    public void receiveSocketError(SocketError socketError) {
+        if (retryCount > 1) {
+            hideLoadingOverlay();
+            if (mTargetFragment != null) {
+                mTargetFragment.onActivityResult(getTargetRequestCode(), SEND_FAILED, mActivity.getIntent());
+            }
+            dismiss();
+        } else {
+            executeSend();
+        }
     }
 
     /**

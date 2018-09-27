@@ -1,7 +1,7 @@
 <resources>
     <!-- Intro Welcome Screen -->
     <string name="intro_welcome_title">Willkommen bei Kalium. Um fortzufahren, benötigst du ein Wallet. Erstelle bitte ein neues Wallet oder importiere ein bereits existierendes Wallet.</string>
-    <string name="intro_welcome_new_wallet">Neues Wallet</string>
+    <string name="intro_welcome_new_wallet">Neue Wallet</string>
     <string name="intro_welcome_have_wallet">Wallet importieren</string>
     <!-- Intro New Wallet Screens -->
     <string name="intro_new_wallet_seed">Unten siehst du deinen Seed.\nEs ist extrem wichtig, dass du ein Backup deines Seeds erstellst.\nSichere deinen Seed niemals als Klartext oder mit einem Screenshot.</string>
@@ -151,6 +151,14 @@
     <string name="contact_import_permission_error">Bitte erteile Kalium Lesezugriff.</string>
     <string name="contact_export_permission_error">Bitte erteile Kalium Schreibzugriff.</string>
     <string name="contact_export_success">Kontakte gespeichert in %s</string>
+
+    <!-- Push Notifications -->
+    <string name="notifications_settings">Benachrichtigungen</string>
+    <string name="generic_on">An</string>
+    <string name="generic_off">Aus</string>
+    <string name="notification_title">%s BANANO erhalten</string>
+    <string name="notification_body">Öffne Kalium, um diese Transaktion zu sehen.</string>
+    <string name="notificaiton_header_suplement">Zum Öffnen tippen</string>
 
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">Scanne einen\nBanano-Address-QR-Code</string>

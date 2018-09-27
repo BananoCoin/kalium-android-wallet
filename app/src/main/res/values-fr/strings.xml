@@ -151,6 +151,15 @@
     <string name="contact_import_permission_error">Veuillez s.v.p. autoriser Kalium à déterminer l’espace de stockage de l’appareil.</string>
     <string name="contact_export_permission_error">Veuillez s.v.p. autoriser Kalium à occuper de l’espace de stockage sur l’appareil.</string>
     <string name="contact_export_success">Contacts sauvergardés vers %s</string>
+
+    <!-- Push Notifications -->
+    <string name="notifications_settings">Notifications</string>
+    <string name="generic_on">Ouvert</string>
+    <string name="generic_off">Fermé</string>
+    <string name="notification_title">%s BANANO reçus</string>
+    <string name="notification_body">Ouvrir Kalium pour voir cette transaction.</string>
+    <string name="notificaiton_header_suplement">Appuyez pour ouvrir</string>
+
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">Scanner le code QR d’une adresse Banano</string>
 </resources>

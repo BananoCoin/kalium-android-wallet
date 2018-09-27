@@ -138,6 +138,13 @@
     <string name="contact_view_header">Contact:</string>
     <string name="contact_remove_header">Verwijder:</string>
     <string name="contact_remove_btn">Verwijder Contact</string>
+    <!-- Push Notifications -->
+    <string name="notifications_settings">Notificaties</string>
+    <string name="generic_on">Aan</string>
+    <string name="generic_off">Uit</string>
+    <string name="notification_title">%s BANANO ontvangen</string>
+    <string name="notification_body">Open Kalium om de transactie te zien.</string>
+    <string name="notificaiton_header_suplement">Tik om te openen</string>
 
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">Scan een Banano \nadres QR code</string>

@@ -41,6 +41,7 @@ import com.banano.kaliumwallet.ui.common.FragmentUtility;
 import com.banano.kaliumwallet.ui.common.UIUtil;
 import com.banano.kaliumwallet.ui.common.WindowControl;
 import com.banano.kaliumwallet.ui.contact.ContactOverviewFragment;
+import com.banano.kaliumwallet.ui.webview.WebViewDialogFragment;
 import com.banano.kaliumwallet.util.LocaleUtil;
 import com.banano.kaliumwallet.util.SharedPreferencesUtil;
 import com.github.ajalt.reprint.core.AuthenticationFailureReason;
@@ -541,6 +542,16 @@ public class SettingsFragment extends BaseFragment {
                         R.anim.slide_out_right);
                 ContactOverviewFragment fragment = ContactOverviewFragment.newInstance();
                 ft.replace(R.id.settings_frag_container, fragment, ContactOverviewFragment.TAG).addToBackStack(null).commit();
+                ((WindowControl) getActivity()).getFragmentUtility().getFragmentManager().executePendingTransactions();
+            }
+        }
+
+        public void onClickPrivacy(View view) {
+            if (getActivity() instanceof WindowControl) {
+                // show webview dialog
+                WebViewDialogFragment dialog = WebViewDialogFragment.newInstance(getString(R.string.privacy_policy_url), "");
+                dialog.show(((WindowControl) getActivity()).getFragmentUtility().getFragmentManager(),
+                        WebViewDialogFragment.TAG);
                 ((WindowControl) getActivity()).getFragmentUtility().getFragmentManager().executePendingTransactions();
             }
         }

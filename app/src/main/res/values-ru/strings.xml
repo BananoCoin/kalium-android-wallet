@@ -158,8 +158,8 @@
     <string name="notifications_settings">Уведомления</string>
     <string name="generic_on">Вкл.</string>
     <string name="generic_off">Выкл.</string>
-    <string name="notification_title">Полученно %s BANANO</string>
-    <string name="notification_body">Откройте Kalium для просмотра транзакции.</string>
+    <string name="notification_title">Получено %s BANANO</string>
+    <string name="notification_body">Откройте Kalium для просмотра.</string>
     <string name="notificaiton_header_suplement">Нажмите чтобы открыть</string>
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">Сканировать  QR-код Banano/адрес.</string>

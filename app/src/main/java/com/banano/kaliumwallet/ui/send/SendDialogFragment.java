@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 
 import com.banano.kaliumwallet.R;
 import com.banano.kaliumwallet.bus.ContactSelected;
@@ -181,6 +182,11 @@ public class SendDialogFragment extends BaseDialogFragment {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 String curText = binding.sendAddress.getText().toString().trim();
+                if (curText.length() > 0) {
+                    binding.sendAddressContact.setVisibility(View.GONE);
+                } else {
+                    binding.sendAddressContact.setVisibility(View.VISIBLE);
+                }
                 if (curText.startsWith("@")) {
                     if (toContact) {
                         toContact = false;
@@ -326,6 +332,11 @@ public class SendDialogFragment extends BaseDialogFragment {
             binding.sendAddress.requestFocus();
             binding.sendAddress.setText(contactName);
             binding.sendAddress.clearFocus();
+        }
+
+        // Show contract trigger button if applicable
+        if (binding.sendAddress.getText().length() > 0) {
+            binding.sendAddressContact.setVisibility(View.GONE);
         }
 
         return view;
@@ -539,6 +550,14 @@ public class SendDialogFragment extends BaseDialogFragment {
                 Address address = new Address(clipboard.getPrimaryClip().getItemAt(0).getText().toString());
                 binding.sendAddress.setText(address.getAddress());
             }
+        }
+
+        public void onClickContactTrigger(View view) {
+            binding.sendAddress.setText("@");
+            binding.sendAddress.requestFocus();
+            binding.sendAddress.setSelection(1);
+            InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(binding.sendAddress, InputMethodManager.SHOW_IMPLICIT);
         }
     }
 }
