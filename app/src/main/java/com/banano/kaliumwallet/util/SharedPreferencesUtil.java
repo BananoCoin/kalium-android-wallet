@@ -12,6 +12,7 @@ import com.banano.kaliumwallet.model.PreconfiguredRepresentatives;
 import com.banano.kaliumwallet.model.PriceConversion;
 import com.github.ajalt.reprint.core.Reprint;
 
+import java.util.Currency;
 import java.util.Locale;
 
 /**
@@ -69,8 +70,18 @@ public class SharedPreferencesUtil {
         editor.apply();
     }
 
+    private AvailableCurrency getDefaultCurrency() {
+        String symbol = Currency.getInstance(getDefaultLocale()).getCurrencyCode();
+        for (AvailableCurrency value: AvailableCurrency.values()) {
+            if (symbol.equals(value.toString())) {
+                return value;
+            }
+        }
+        return AvailableCurrency.USD;
+    }
+
     public AvailableCurrency getLocalCurrency() {
-        return AvailableCurrency.valueOf(get(LOCAL_CURRENCY, AvailableCurrency.USD.toString()));
+        return AvailableCurrency.valueOf(get(LOCAL_CURRENCY, getDefaultCurrency().toString()));
     }
 
     public void setLocalCurrency(AvailableCurrency localCurrency) {

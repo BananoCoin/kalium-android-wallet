@@ -194,7 +194,6 @@ public class SendDialogFragment extends BaseDialogFragment {
                         binding.sendAddress.clearFocus();
                         return;
                     }
-                    binding.contactRecyclerview.setVisibility(View.VISIBLE);
                     binding.sendAddress.setGravity(Gravity.START);
                     binding.sendAddress.setBackground(getResources().getDrawable(R.drawable.bg_edittext_bottom_round));
                     updateContactSearch();
@@ -366,6 +365,8 @@ public class SendDialogFragment extends BaseDialogFragment {
         mAdapter.updateList(contacts);
         // Colorize name if a valid contact
         if (contacts.size() > 0) {
+            binding.contactRecyclerview.setVisibility(View.VISIBLE);
+            binding.sendAddress.setBackground(getResources().getDrawable(R.drawable.bg_edittext_bottom_round));
             String name = binding.sendAddress.getText().toString().trim();
             boolean foundMatch = false;
             for (Contact c : contacts) {
@@ -379,6 +380,8 @@ public class SendDialogFragment extends BaseDialogFragment {
                 binding.sendAddress.setTextColor(getResources().getColor(R.color.white_60));
             }
         } else {
+            binding.contactRecyclerview.setVisibility(View.GONE);
+            binding.sendAddress.setBackground(getResources().getDrawable(R.drawable.bg_edittext));
             binding.sendAddress.setTextColor(getResources().getColor(R.color.white_60));
         }
     }
