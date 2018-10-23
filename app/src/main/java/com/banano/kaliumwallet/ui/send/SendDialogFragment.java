@@ -75,6 +75,7 @@ public class SendDialogFragment extends BaseDialogFragment {
     private Address address;
     private Activity mActivity;
     private ContactSelectionAdapter mAdapter;
+    private boolean maxSend = false;
 
     /**
      * Create new instance of the dialog fragment (handy pattern if any data needs to be passed to it)
@@ -100,6 +101,7 @@ public class SendDialogFragment extends BaseDialogFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // init dependency injection
         mActivity = getActivity();
+        maxSend = false;
         if (mActivity instanceof ActivityWithComponent) {
             ((ActivityWithComponent) mActivity).getActivityComponent().inject(this);
         }
@@ -281,6 +283,13 @@ public class SendDialogFragment extends BaseDialogFragment {
                 }
                 wallet.setSendBananoAmount(charSequence.toString().trim());
                 binding.setWallet(wallet);
+                String amount = String.format(Locale.ENGLISH, "%.2f", wallet.getUsableAccountBalanceBanano().floatValue());
+                amount = amount.indexOf(".") < 0 ? amount : amount.replaceAll("0*$", "").replaceAll("\\.$", "");
+                if (amount.equals(charSequence.toString().trim())) {
+                    maxSend = true;
+                } else {
+                    maxSend = false;
+                }
                 hideAmountError();
             }
         });
@@ -467,7 +476,14 @@ public class SendDialogFragment extends BaseDialogFragment {
 
     private void showSendCompleteDialog() {
         // show complete dialog
-        SendCompleteDialogFragment dialog = SendCompleteDialogFragment.newInstance(binding.sendAddress.getText().toString(), binding.sendAmount.getText().toString());
+        String sendAmount;
+        if (maxSend) {
+            sendAmount = String.format(Locale.ENGLISH, "%.2f", wallet.getUsableAccountBalanceBanano().floatValue());
+            sendAmount = sendAmount.indexOf(".") < 0 ? sendAmount : sendAmount.replaceAll("0*$", "").replaceAll("\\.$", "");
+        } else {
+            sendAmount = wallet.getSendBananoAmount();
+        }
+        SendCompleteDialogFragment dialog = SendCompleteDialogFragment.newInstance(binding.sendAddress.getText().toString(), sendAmount);
         dialog.show(((WindowControl) mActivity).getFragmentUtility().getFragmentManager(),
                 SendCompleteDialogFragment.TAG);
         executePendingTransactions();
@@ -475,7 +491,11 @@ public class SendDialogFragment extends BaseDialogFragment {
 
     private void showSendConfirmDialog() {
         // show send dialog
-        SendConfirmDialogFragment dialog = SendConfirmDialogFragment.newInstance(binding.sendAddress.getText().toString(), binding.sendAmount.getText().toString());
+        String sendAmount = wallet.getSendBananoAmount();
+        if (maxSend) {
+            sendAmount = "0";
+        }
+        SendConfirmDialogFragment dialog = SendConfirmDialogFragment.newInstance(binding.sendAddress.getText().toString(), sendAmount);
         dialog.setTargetFragment(this, SEND_RESULT);
         dialog.show(((WindowControl) mActivity).getFragmentUtility().getFragmentManager(),
                 SendConfirmDialogFragment.TAG);
@@ -506,6 +526,8 @@ public class SendDialogFragment extends BaseDialogFragment {
                     // set to scanned value
                     if (address.getAddress() != null) {
                         binding.sendAddress.setText(address.getAddress());
+                        binding.sendAddress.requestFocus();
+                        binding.sendAddress.clearFocus();
                     }
 
                     if (address.getAmount() != null) {
@@ -552,6 +574,8 @@ public class SendDialogFragment extends BaseDialogFragment {
             if (clipboard != null && clipboard.hasPrimaryClip() && clipboard.getPrimaryClipDescription().hasMimeType(MIMETYPE_TEXT_PLAIN)) {
                 Address address = new Address(clipboard.getPrimaryClip().getItemAt(0).getText().toString());
                 binding.sendAddress.setText(address.getAddress());
+                binding.sendAddress.requestFocus();
+                binding.sendAddress.clearFocus();
             }
         }
 

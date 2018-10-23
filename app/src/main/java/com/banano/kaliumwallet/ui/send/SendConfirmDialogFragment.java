@@ -72,6 +72,7 @@ public class SendConfirmDialogFragment extends BaseDialogFragment {
     private Activity mActivity;
     private Fragment mTargetFragment;
     private int retryCount = 0;
+    private boolean maxSend = false;
 
     /**
      * Create new instance of the dialog fragment (handy pattern if any data needs to be passed to it)
@@ -105,7 +106,16 @@ public class SendConfirmDialogFragment extends BaseDialogFragment {
         }
 
         String destination = getArguments().getString("destination");
-        String amount = String.format(Locale.ENGLISH, "%.2f", Float.parseFloat(getArguments().getString("amount")));
+        float sendAmountF =  Float.parseFloat(getArguments().getString("amount"));
+        String amount;
+        if (sendAmountF != 0) {
+            maxSend = false;
+            amount = String.format(Locale.ENGLISH, "%.2f", sendAmountF);
+        } else {
+            maxSend = true;
+            amount = String.format(Locale.ENGLISH, "%.2f", wallet.getUsableAccountBalanceBanano().floatValue());
+            amount = amount.indexOf(".") < 0 ? amount : amount.replaceAll("0*$", "").replaceAll("\\.$", "");
+        }
 
         // subscribe to bus
         RxBus.get().register(this);
@@ -216,7 +226,12 @@ public class SendConfirmDialogFragment extends BaseDialogFragment {
     private void executeSend() {
         retryCount++;
         showLoadingOverlay();
-        BigInteger sendAmount = NumberUtil.getAmountAsRawBigInteger(wallet.getSendBananoAmount());
+        BigInteger sendAmount;
+        if (maxSend) {
+            sendAmount = new BigInteger("0");
+        } else {
+            sendAmount = NumberUtil.getAmountAsRawBigInteger(wallet.getSendBananoAmount());
+        }
 
         accountService.requestSend(wallet.getFrontierBlock(), address, sendAmount);
     }

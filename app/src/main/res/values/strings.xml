@@ -108,7 +108,7 @@
     <string name="receive_copied">Address Copied</string>
     <string name="receive_share_title">Share via…</string>
     <string name="receive_card_label_one" translatable="false">$BAN</string>
-    <string name="receive_card_label_two" translatable="false">BANANO.CO.IN</string>
+    <string name="receive_card_label_two" translatable="false">BANANO.CC</string>
     <string name="receive_card_title">Banano</string>
     <string name="receive_qrcode_description">QR Code</string>
 
