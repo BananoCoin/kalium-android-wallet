@@ -25,7 +25,6 @@ import com.banano.kaliumwallet.R;
 import com.banano.kaliumwallet.bus.CreatePin;
 import com.banano.kaliumwallet.bus.PinComplete;
 import com.banano.kaliumwallet.bus.RxBus;
-import com.banano.kaliumwallet.bus.SendInvalidAmount;
 import com.banano.kaliumwallet.bus.SocketError;
 import com.banano.kaliumwallet.databinding.FragmentSendConfirmBinding;
 import com.banano.kaliumwallet.model.Address;
@@ -113,8 +112,7 @@ public class SendConfirmDialogFragment extends BaseDialogFragment {
             amount = String.format(Locale.ENGLISH, "%.2f", sendAmountF);
         } else {
             maxSend = true;
-            amount = String.format(Locale.ENGLISH, "%.2f", wallet.getUsableAccountBalanceBanano().floatValue());
-            amount = amount.indexOf(".") < 0 ? amount : amount.replaceAll("0*$", "").replaceAll("\\.$", "");
+            amount = wallet.getAccountBalanceBananoNoComma();
         }
 
         // subscribe to bus
@@ -234,20 +232,6 @@ public class SendConfirmDialogFragment extends BaseDialogFragment {
         }
 
         accountService.requestSend(wallet.getFrontierBlock(), address, sendAmount);
-    }
-
-    /**
-     * Event that occurs if an amount entered is invalid
-     *
-     * @param sendInvalidAmount Send Invalid Amount event
-     */
-    @Subscribe
-    public void receiveInvalidAmount(SendInvalidAmount sendInvalidAmount) {
-        hideLoadingOverlay();
-        if (mTargetFragment != null) {
-            mTargetFragment.onActivityResult(getTargetRequestCode(), SEND_FAILED_AMOUNT, mActivity.getIntent());
-        }
-        dismiss();
     }
 
     /**

@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.banano.kaliumwallet.KaliumUtil;
 import com.banano.kaliumwallet.bus.RxBus;
-import com.banano.kaliumwallet.bus.SendInvalidAmount;
 import com.banano.kaliumwallet.bus.WalletClear;
 import com.banano.kaliumwallet.bus.WalletHistoryUpdate;
 import com.banano.kaliumwallet.bus.WalletPriceUpdate;
@@ -125,6 +124,10 @@ public class KaliumWallet {
         return NumberUtil.getRawAsUsableString(accountBalance.toString());
     }
 
+    public String getAccountBalanceBananoNoComma() {
+        return NumberUtil.getRawAsUsableString(accountBalance.toString()).replace(",", "");
+    }
+
     public BigDecimal getAccountBalanceBananoRaw() {
         return accountBalance;
     }
@@ -211,7 +214,6 @@ public class KaliumWallet {
         } else {
             this.sendLocalCurrencyAmount = "";
         }
-        validateSendAmount();
     }
 
     /**
@@ -336,21 +338,6 @@ public class KaliumWallet {
                 amount = df.format(new BigDecimal(sanitizeNoCommas(amount)));
             }
             return amount;
-        }
-    }
-
-    /**
-     * Validate that the requested send amount is not greater than the account balance
-     */
-
-    private void validateSendAmount() {
-        try {
-            if (new BigDecimal(sanitizeNoCommas(sendBananoAmount))
-                    .compareTo(new BigDecimal(sanitizeNoCommas(NumberUtil.getRawAsLongerUsableString(accountBalance.toString())))) > 0) {
-                RxBus.get().post(new SendInvalidAmount());
-            }
-        } catch (NumberFormatException e) {
-            ExceptionHandler.handle(e);
         }
     }
 
