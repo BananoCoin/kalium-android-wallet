@@ -18,7 +18,7 @@
             type="com.banano.kaliumwallet.model.AvailableCurrency" />
     </data>
 
-    <android.support.v4.widget.DrawerLayout
+    <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -29,7 +29,7 @@
             android:fitsSystemWindows="true"
             android:orientation="vertical">
 
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/gray">
@@ -42,7 +42,7 @@
                     android:background="@drawable/bg_home_top_card"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <android.support.v7.widget.AppCompatImageView
+                    <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/settings_button"
                         android:layout_width="35dp"
                         android:layout_height="35dp"
@@ -56,7 +56,7 @@
                         android:padding="5dp"
                         app:srcCompat="@drawable/ic_settings" />
 
-                    <android.support.v7.widget.AppCompatImageView
+                    <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/home_monkey"
                         android:layout_width="@dimen/monkey_width"
                         android:layout_height="@dimen/monkey_height"
@@ -74,6 +74,7 @@
                         android:layout_above="@id/amount_banano_title"
                         android:layout_centerInParent="true"
                         android:layout_marginBottom="-3dp"
+                        android:visibility="gone"
                         android:text="@{wallet.accountBalanceLocalCurrency}"
                         tools:text="18.000001" />
 
@@ -116,7 +117,7 @@
                         android:orientation="horizontal"
                         android:visibility="gone">
 
-                        <android.support.v7.widget.AppCompatImageView
+                        <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/amount_nano_symbol"
                             style="@style/TextStyleSubcurrency"
                             android:layout_width="wrap_content"
@@ -133,13 +134,14 @@
                             tools:text="18.000001" />
                     </LinearLayout>
 
-                    <android.support.v7.widget.AppCompatImageView
+                    <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/amount_banano_symbol"
                         android:layout_width="23dp"
                         android:layout_height="23dp"
                         android:layout_centerInParent="true"
                         android:layout_marginStart="2dp"
                         android:layout_toStartOf="@id/amount_banano_title"
+                        android:visibility="gone"
                         android:paddingBottom="13dp"
                         app:srcCompat="@drawable/ic_currency_banano_yellow" />
 
@@ -153,8 +155,17 @@
                         android:focusable="true"
                         android:onClick="@{handlers::onClickPrice}"
                         android:paddingBottom="3dp"
+                        android:visibility="gone"
                         android:text="@{wallet.accountBalanceBanano}"
                         tools:text="18,024.12" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/banano_placeholder"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_centerInParent="true"
+                        app:srcCompat="@drawable/ic_currency_banano_yellow" />
+
                 </RelativeLayout>
 
                 <TextView
@@ -170,7 +181,7 @@
                     app:layout_constraintBottom_toTopOf="@id/home_swiperefresh"
                     app:layout_constraintTop_toBottomOf="@id/home_top_card" />
 
-                <android.support.v4.widget.NestedScrollView
+                <androidx.core.widget.NestedScrollView
                     android:id="@+id/example_cards"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -198,9 +209,9 @@
                             layout="@layout/welcome_account_item_receive" />
                     </LinearLayout>
 
-                </android.support.v4.widget.NestedScrollView>
+                </androidx.core.widget.NestedScrollView>
 
-                <android.support.v4.widget.SwipeRefreshLayout
+                <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
                     android:id="@+id/home_swiperefresh"
                     android:layout_width="match_parent"
@@ -210,13 +221,13 @@
                     android:layout_marginRight="10dp"
                     android:layout_marginTop="@dimen/tx_history_top_margin">
 
-                    <android.support.v7.widget.RecyclerView
+                    <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/home_recyclerview"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:requiresFadingEdge="vertical"
                         android:theme="@style/AppThemeYellow" />
-                </android.support.v4.widget.SwipeRefreshLayout>
+                </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 
                 <LinearLayout
@@ -292,7 +303,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"/>
 
-                <android.support.constraint.Guideline
+                <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/home_guideline_vert"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -314,7 +325,7 @@
                     app:layout_constraintTop_toTopOf="parent">
 
 
-                    <android.support.v7.widget.AppCompatImageView
+                    <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/monkey_overlay_img"
                         android:layout_width="350dp"
                         android:layout_height="350dp"
@@ -322,7 +333,7 @@
 
                 </FrameLayout>
 
-            </android.support.constraint.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
 
         <LinearLayout
@@ -338,5 +349,5 @@
                 android:layout_weight="1" />
         </LinearLayout>
 
-    </android.support.v4.widget.DrawerLayout>
+    </androidx.drawerlayout.widget.DrawerLayout>
 </layout>

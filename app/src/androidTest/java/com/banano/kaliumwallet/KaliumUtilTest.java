@@ -1,8 +1,9 @@
 package com.banano.kaliumwallet;
 
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.runner.AndroidJUnit4;
 
 import com.banano.kaliumwallet.network.model.request.block.OpenBlock;
+import com.rotilho.jnano.commons.NanoHelper;
 
 import org.junit.After;
 import org.junit.Before;
@@ -98,7 +99,7 @@ public class KaliumUtilTest {
 
     @Test
     public void hexStringToByteArray() {
-        KaliumUtil.hexStringToByteArray("fukSkBVmBBwKMmzgH78wl9h07MTWSvBVORsxFvoLPTBoUHKdRyFnbOVBuztny5yzn40DwIFbdeQyjkAOZu3PTgCU5Ulv9oswJhR4kdDp18axXPT3JeCJxA8NO0Ln7JB");
+        NanoHelper.toByteArray("fukSkBVmBBwKMmzgH78wl9h07MTWSvBVORsxFvoLPTBoUHKdRyFnbOVBuztny5yzn40DwIFbdeQyjkAOZu3PTgCU5Ulv9oswJhR4kdDp18axXPT3JeCJxA8NO0Ln7JB");
     }
 
     @After

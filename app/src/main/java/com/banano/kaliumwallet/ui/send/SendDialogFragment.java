@@ -3,13 +3,13 @@ package com.banano.kaliumwallet.ui.send;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -54,6 +54,7 @@ import javax.inject.Inject;
 import io.realm.Case;
 import io.realm.Realm;
 import io.realm.RealmQuery;
+import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.ClipDescription.MIMETYPE_TEXT_PLAIN;
@@ -284,11 +285,15 @@ public class SendDialogFragment extends BaseDialogFragment {
                 wallet.setSendBananoAmount(charSequence.toString().trim());
                 binding.setWallet(wallet);
 
-                if (new BigDecimal(charSequence.toString().trim())
+                try {
+                    if (new BigDecimal(charSequence.toString().trim())
                             .compareTo(new BigDecimal(wallet.getAccountBalanceBananoNoComma())) == 0) {
-                    maxSend = true;
-                } else {
-                    maxSend = false;
+                        maxSend = true;
+                    } else {
+                        maxSend = false;
+                    }
+                } catch (NumberFormatException nfe) {
+                    Timber.e(nfe);
                 }
                 hideAmountError();
             }

@@ -1,7 +1,7 @@
 package com.banano.kaliumwallet.ui.home;
 
-import android.support.annotation.Nullable;
-import android.support.v7.util.DiffUtil;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DiffUtil;
 
 import com.banano.kaliumwallet.network.model.response.AccountHistoryResponseItem;
 

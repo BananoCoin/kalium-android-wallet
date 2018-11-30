@@ -10,7 +10,7 @@
             type="com.banano.kaliumwallet.model.Contact" />
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_settings_item"
@@ -23,7 +23,7 @@
             android:background="@color/white_10"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/contact_overview_monkey"
             android:layout_width="50dp"
             android:layout_height="50dp"
@@ -65,12 +65,12 @@
             android:background="@color/white_10"
             app:layout_constraintBottom_toBottomOf="parent" />
 
-        <android.support.constraint.Guideline
+        <androidx.constraintlayout.widget.Guideline
             android:id="@+id/view_holder_contact_guideline_horiz"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             app:layout_constraintGuide_percent="0.5"
             />
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

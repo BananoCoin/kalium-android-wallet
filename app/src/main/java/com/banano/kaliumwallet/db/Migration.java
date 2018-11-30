@@ -1,6 +1,6 @@
 package com.banano.kaliumwallet.db;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import io.realm.DynamicRealm;
 import io.realm.FieldAttribute;

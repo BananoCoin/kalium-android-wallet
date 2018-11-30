@@ -51,7 +51,7 @@
         <receiver android:name="com.banano.kaliumwallet.broadcastreceiver.CancelNotificationReceiver" />
 
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="com.banano.kaliumwallet.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">

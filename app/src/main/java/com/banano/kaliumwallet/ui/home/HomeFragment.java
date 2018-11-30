@@ -2,20 +2,20 @@ package com.banano.kaliumwallet.ui.home;
 
 import android.app.Activity;
 import android.content.Context;
-import android.databinding.BindingMethod;
-import android.databinding.BindingMethods;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.BindingMethod;
+import androidx.databinding.BindingMethods;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.drawable.PictureDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.ViewDragHelper;
-import android.support.v7.widget.LinearLayoutManager;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.customview.widget.ViewDragHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -82,7 +82,7 @@ import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOption
  */
 
 @BindingMethods({
-        @BindingMethod(type = android.support.v7.widget.AppCompatImageView.class,
+        @BindingMethod(type = androidx.appcompat.widget.AppCompatImageView.class,
                 attribute = "srcCompat",
                 method = "setImageDrawable")
 })
@@ -216,8 +216,6 @@ public class HomeFragment extends BaseFragment implements FragmentOnBackListener
             updateAccountHistory();
         }
 
-        updateAmounts();
-
         Credentials credentials = realm.where(Credentials.class).findFirst();
 
         // Retrieve/populate monKey
@@ -279,23 +277,6 @@ public class HomeFragment extends BaseFragment implements FragmentOnBackListener
         } catch (Exception e) {
             // we unexpectedly failed - e.g. if internal implementation of
             // either ViewDragHelper or DrawerLayout changed
-        }
-
-        // Set default price
-        switch (sharedPreferencesUtil.getPriceConversion()) {
-            case BTC:
-                binding.btcPrice.setVisibility(View.VISIBLE);
-                binding.nanoPrice.setVisibility(View.GONE);
-                break;
-            case NANO:
-                binding.nanoPrice.setVisibility(View.VISIBLE);
-                binding.btcPrice.setVisibility(View.GONE);
-                break;
-            default:
-                binding.nanoPrice.setVisibility(View.GONE);
-                binding.btcPrice.setVisibility(View.GONE);
-                binding.amountLocalCurrencyTitle.setVisibility(View.GONE);
-                break;
         }
 
         // Change status bar color when drawer open
@@ -499,6 +480,28 @@ public class HomeFragment extends BaseFragment implements FragmentOnBackListener
                 // if balance > 0, enable send button
                 binding.homeSendButton.setEnabled(true);
                 binding.homeSendButton.setBackground(getResources().getDrawable(R.drawable.bg_solid_button));
+                // Hide placeholder
+                binding.bananoPlaceholder.setVisibility(View.GONE);
+                binding.amountBananoSymbol.setVisibility(View.VISIBLE);
+                binding.amountBananoTitle.setVisibility(View.VISIBLE);
+                // Set default price
+                switch (sharedPreferencesUtil.getPriceConversion()) {
+                    case BTC:
+                        binding.btcPrice.setVisibility(View.VISIBLE);
+                        binding.amountLocalCurrencyTitle.setVisibility(View.VISIBLE);
+                        binding.nanoPrice.setVisibility(View.GONE);
+                        break;
+                    case NANO:
+                        binding.nanoPrice.setVisibility(View.VISIBLE);
+                        binding.amountLocalCurrencyTitle.setVisibility(View.VISIBLE);
+                        binding.btcPrice.setVisibility(View.GONE);
+                        break;
+                    default:
+                        binding.nanoPrice.setVisibility(View.GONE);
+                        binding.btcPrice.setVisibility(View.GONE);
+                        binding.amountLocalCurrencyTitle.setVisibility(View.GONE);
+                        break;
+                }
                 // Tweak sizing based on how big amount is
                 String balBanano = wallet.getAccountBalanceBanano();
                 binding.amountBananoTitle.setText(balBanano);
