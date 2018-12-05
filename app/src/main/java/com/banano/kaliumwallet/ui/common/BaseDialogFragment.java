@@ -168,6 +168,7 @@ public class BaseDialogFragment extends DialogFragment {
         } else {
             Intent intent = new Intent(getActivity(), ScanActivity.class);
             intent.putExtra(ScanActivity.EXTRA_TITLE, this.scanActivityTitle);
+            intent.putExtra(ScanActivity.EXTRA_SEED_MODE, isSeedScanner);
             startActivityForResult(intent, SCAN_RESULT);
         }
     }

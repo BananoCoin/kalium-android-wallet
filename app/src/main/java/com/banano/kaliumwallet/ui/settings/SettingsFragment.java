@@ -41,6 +41,7 @@ import com.banano.kaliumwallet.ui.common.FragmentUtility;
 import com.banano.kaliumwallet.ui.common.UIUtil;
 import com.banano.kaliumwallet.ui.common.WindowControl;
 import com.banano.kaliumwallet.ui.contact.ContactOverviewFragment;
+import com.banano.kaliumwallet.ui.transfer.TransferIntroDialogFragment;
 import com.banano.kaliumwallet.ui.webview.WebViewDialogFragment;
 import com.banano.kaliumwallet.util.LocaleUtil;
 import com.banano.kaliumwallet.util.SharedPreferencesUtil;
@@ -399,6 +400,12 @@ public class SettingsFragment extends BaseFragment {
         getFragmentManager().executePendingTransactions();
     }
 
+    private void showTransferDialog() {
+        TransferIntroDialogFragment dialog = TransferIntroDialogFragment.newInstance();
+        dialog.show(getFragmentManager(), TransferIntroDialogFragment.TAG);
+        getFragmentManager().executePendingTransactions();
+    }
+
     private void showFingerprintDialog(View view) {
         int style = android.os.Build.VERSION.SDK_INT >= 21 ? R.style.AlertDialogCustom : android.R.style.Theme_Holo_Dialog;
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), style);
@@ -445,6 +452,12 @@ public class SettingsFragment extends BaseFragment {
         public void onClickChange(View view) {
             if (getActivity() instanceof WindowControl) {
                 showChangeRepDialog();
+            }
+        }
+
+        public void onClickTransfer(View view) {
+            if (getActivity() instanceof WindowControl) {
+                showTransferDialog();
             }
         }
 

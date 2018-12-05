@@ -176,6 +176,15 @@
     <string name="notification_body">Open Kalium to view this transaction.</string>
     <string name="notificaiton_header_suplement">Tap to open</string>
 
+    <!-- Transfer Funds -->
+    <!-- Settings Menu -->
+    <string name="settings_transfer">Load from Paper Wallet</string>
+    <!-- Initial Screen -->
+    <string name="transfer_header">Transfer\nFunds:</string>
+    <string name="transfer_intro">This process will transfer the funds from a paper wallet to your Kalium wallet.\n\nTap the \"%s\" button to start.</string>
+    <string name="transfer_qr_scan_hint">Scan a Banano \nseed QR code</string>
+    <string name="transfer_qr_scan_error">Did not find a valid seed</string>
+
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">Scan a Banano \naddress QR code</string>
 </resources>

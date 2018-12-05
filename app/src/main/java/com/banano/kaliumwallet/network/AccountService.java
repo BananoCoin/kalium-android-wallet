@@ -16,6 +16,7 @@ import com.banano.kaliumwallet.network.model.BaseResponse;
 import com.banano.kaliumwallet.network.model.BlockTypes;
 import com.banano.kaliumwallet.network.model.RequestItem;
 import com.banano.kaliumwallet.network.model.request.AccountHistoryRequest;
+import com.banano.kaliumwallet.network.model.request.AccountsBalancesRequest;
 import com.banano.kaliumwallet.network.model.request.GetBlocksInfoRequest;
 import com.banano.kaliumwallet.network.model.request.PendingTransactionsRequest;
 import com.banano.kaliumwallet.network.model.request.ProcessRequest;
@@ -26,6 +27,8 @@ import com.banano.kaliumwallet.network.model.request.block.OpenBlock;
 import com.banano.kaliumwallet.network.model.request.block.ReceiveBlock;
 import com.banano.kaliumwallet.network.model.request.block.SendBlock;
 import com.banano.kaliumwallet.network.model.request.block.StateBlock;
+import com.banano.kaliumwallet.network.model.response.AccountBalanceItem;
+import com.banano.kaliumwallet.network.model.response.AccountsBalancesResponse;
 import com.banano.kaliumwallet.network.model.response.BlockInfoItem;
 import com.banano.kaliumwallet.network.model.response.BlockItem;
 import com.banano.kaliumwallet.network.model.response.BlocksInfoResponse;
@@ -208,6 +211,9 @@ public class AccountService {
         } else if (event != null &&
                 event instanceof BlocksInfoResponse) {
             handleBlocksInfoResponse((BlocksInfoResponse) event);
+        } else if (event != null &&
+                event instanceof AccountsBalancesResponse) {
+            handleAccountsBalancesResponse((AccountsBalancesResponse) event);
         } else {
             // update block count on subscribe request
             if (event instanceof SubscribeResponse) {
@@ -377,6 +383,15 @@ public class AccountService {
         }
 
         processQueue();
+    }
+
+    /**
+     * When balances come back we need to emit the data for each account/balance/pending
+     *
+     * @param balancesResponse AccountsBalancesResponse Response
+     */
+    private void handleAccountsBalancesResponse(AccountsBalancesResponse balancesResponse) {
+        HashMap<String, AccountBalanceItem> accountBalances = balancesResponse.getBalances();
     }
 
 
