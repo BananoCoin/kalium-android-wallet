@@ -11,15 +11,30 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.banano.kaliumwallet.KaliumUtil;
 import com.banano.kaliumwallet.R;
+import com.banano.kaliumwallet.bus.RxBus;
 import com.banano.kaliumwallet.databinding.FragmentTransferBinding;
+import com.banano.kaliumwallet.network.AccountService;
+import com.banano.kaliumwallet.network.model.response.AccountBalanceItem;
+import com.banano.kaliumwallet.network.model.response.AccountsBalancesResponse;
 import com.banano.kaliumwallet.ui.common.ActivityWithComponent;
 import com.banano.kaliumwallet.ui.common.BaseDialogFragment;
 import com.banano.kaliumwallet.ui.common.SwipeDismissTouchListener;
 import com.banano.kaliumwallet.ui.common.UIUtil;
 import com.banano.kaliumwallet.ui.scan.ScanActivity;
+import com.hwangjr.rxbus.annotation.Subscribe;
+import com.rotilho.jnano.commons.NanoAmount;
 import com.rotilho.jnano.commons.NanoHelper;
 import com.rotilho.jnano.commons.NanoSeeds;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
@@ -31,8 +46,14 @@ import static android.app.Activity.RESULT_OK;
  */
 public class TransferIntroDialogFragment extends BaseDialogFragment {
     public static String TAG = TransferIntroDialogFragment.class.getSimpleName();
+    private static final int NUM_SWEEP = 15; // Number of accounts to derive/sweep from a seed
+
+    @Inject
+    AccountService accountService;
 
     private FragmentTransferBinding binding;
+
+    private HashMap<String, String> accountPrivkeyMap = new HashMap<>();
 
     /**
      * Create new instance of the dialog fragment (handy pattern if any data needs to be passed to it)
@@ -102,7 +123,17 @@ public class TransferIntroDialogFragment extends BaseDialogFragment {
 
         binding.transferDescription.setText(getString(R.string.transfer_intro, getString(R.string.send_scan_qr)));
 
+        // subscribe to bus
+        RxBus.get().register(this);
+
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // unregister from bus
+        RxBus.get().unregister(this);
     }
 
     @Override
@@ -114,10 +145,35 @@ public class TransferIntroDialogFragment extends BaseDialogFragment {
                 if (res != null) {
                     String result = res.getString(ScanActivity.QR_CODE_RESULT);
 
+                    String privKey;
+                    String account;
                     if (NanoSeeds.isValid(NanoHelper.toByteArray(result))) {
-                        return;
+                        for (int i = 0; i < NUM_SWEEP; i++) {
+                            privKey = KaliumUtil.seedToPrivate(result, i);
+                            account = KaliumUtil.publicToAddress(KaliumUtil.privateToPublic(privKey));
+                            accountPrivkeyMap.put(account, privKey);
+                        }
+                        // Also put the seed itself as a private key, in case thats the intention
+                        accountPrivkeyMap.put(result, KaliumUtil.publicToAddress(KaliumUtil.privateToPublic(result)));
+                        // Make account balances request
+                        List<String> accountsToRequest = new ArrayList<>();
+                        accountService.requestAccountsBalances(accountsToRequest);
                     }
                 }
+            }
+        }
+    }
+
+    @Subscribe
+    public void onAccountBalancesResponse(AccountsBalancesResponse accountsBalancesResponse) {
+        HashMap<String, AccountBalanceItem> accountBalances = accountsBalancesResponse.getBalances();
+        for (Map.Entry<String, AccountBalanceItem> item : accountBalances.entrySet()) {
+            AccountBalanceItem balances = item.getValue();
+            String account = item.getKey();
+            BigInteger balance = new BigInteger(balances.getBalance());
+            BigInteger pending = new BigInteger(balances.getPending());
+            if (balance.add(pending).equals(BigInteger.ZERO)) {
+                accountPrivkeyMap.remove(account);
             }
         }
     }

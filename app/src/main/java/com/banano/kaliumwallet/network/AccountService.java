@@ -391,7 +391,7 @@ public class AccountService {
      * @param balancesResponse AccountsBalancesResponse Response
      */
     private void handleAccountsBalancesResponse(AccountsBalancesResponse balancesResponse) {
-        HashMap<String, AccountBalanceItem> accountBalances = balancesResponse.getBalances();
+        post(balancesResponse);
     }
 
 
@@ -598,6 +598,21 @@ public class AccountService {
             requestQueue.add(new RequestItem<>(new AccountHistoryRequest(address.getAddress(), wallet.getBlockCount() != null ? wallet.getBlockCount() : 10)));
             processQueue();
         }
+    }
+
+    /**
+     * Request AccountsBalances
+     *
+     * @param accounts List of accounts to include in the request
+     * @return true if parameters were valid and request was made
+     */
+    public boolean requestAccountsBalances(List<String> accounts) {
+        if (accounts == null || accounts.isEmpty()) {
+            return false;
+        }
+        requestQueue.add(new RequestItem<>(new AccountsBalancesRequest(accounts)));
+        processQueue();
+        return true;
     }
 
     /**

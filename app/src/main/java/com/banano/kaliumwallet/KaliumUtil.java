@@ -40,8 +40,8 @@ public class KaliumUtil {
      * @param seed Wallet seed
      * @return private key
      */
-    public static String seedToPrivate(String seed) {
-        return NanoHelper.toHex(NanoKeys.createPrivateKey(NanoHelper.toByteArray(seed), 0));
+    public static String seedToPrivate(String seed, int index) {
+        return NanoHelper.toHex(NanoKeys.createPrivateKey(NanoHelper.toByteArray(seed), index));
     }
 
     /**
