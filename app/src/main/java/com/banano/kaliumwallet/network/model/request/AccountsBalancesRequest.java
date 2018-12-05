@@ -1,11 +1,12 @@
 package com.banano.kaliumwallet.network.model.request;
 
 import com.banano.kaliumwallet.network.model.Actions;
+import com.banano.kaliumwallet.network.model.BaseRequest;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class AccountsBalancesRequest {
+public class AccountsBalancesRequest extends BaseRequest {
     @SerializedName("action")
     private String action;
 
