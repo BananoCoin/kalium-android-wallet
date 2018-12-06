@@ -162,7 +162,7 @@ public class TransferIntroDialogFragment extends BaseDialogFragment {
                             if (pubKey.equals(wallet.getPublicKey())) {
                                 continue;
                             }
-                            accountPrivkeyMap.put(account, new AccountBalanceItem());
+                            accountPrivkeyMap.put(account, new AccountBalanceItem(privKey));
                             accountsToRequest.add(account);
                         }
                         // Also put the seed itself as a private key, in case thats the intention
@@ -170,7 +170,7 @@ public class TransferIntroDialogFragment extends BaseDialogFragment {
                         account =  KaliumUtil.publicToAddress(pubKey);
                         // don't let them transfer from their own account
                         if (!pubKey.equals(wallet.getPublicKey())) {
-                            accountPrivkeyMap.put(account, new AccountBalanceItem());
+                            accountPrivkeyMap.put(account, new AccountBalanceItem(result));
                             accountsToRequest.add(account);
                         }
                         // Make account balances request
@@ -179,6 +179,12 @@ public class TransferIntroDialogFragment extends BaseDialogFragment {
                 }
             }
         }
+    }
+
+    private void showConfirmDialog() {
+        TransferConfirmDialogFragment dialog = TransferConfirmDialogFragment.newInstance(accountPrivkeyMap);
+        dialog.show(getFragmentManager(), TransferConfirmDialogFragment.TAG);
+        getFragmentManager().executePendingTransactions();
     }
 
     @Subscribe
@@ -192,13 +198,17 @@ public class TransferIntroDialogFragment extends BaseDialogFragment {
             if (balance.add(pending).equals(BigInteger.ZERO)) {
                 accountPrivkeyMap.remove(account);
             } else {
-                accountPrivkeyMap.put(account, balances);
+                AccountBalanceItem balanceItem = accountPrivkeyMap.get(account);
+                balanceItem.setBalance(balances.getBalance());
+                balanceItem.setPending(balances.getPending());
+                accountPrivkeyMap.put(account, balanceItem);
             }
         }
         if (accountPrivkeyMap.size() == 0) {
             UIUtil.showToast(getString(R.string.transfer_no_funds_toast), getContext());
             return;
         }
+        showConfirmDialog();
     }
 
     public class ClickHandlers {

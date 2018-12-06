@@ -10,6 +10,14 @@ public class AccountBalanceItem extends BaseResponse {
     @SerializedName("pending")
     private String pending;
 
+    private String privKey;
+
+    public AccountBalanceItem() { }
+
+    public AccountBalanceItem(String privKey) {
+        this.privKey = privKey;
+    }
+
     public String getBalance() {
         return balance;
     }
@@ -24,5 +32,13 @@ public class AccountBalanceItem extends BaseResponse {
 
     public void setPending(String pending) {
         this.pending = pending;
+    }
+
+    public String getPrivKey() {
+        return privKey;
+    }
+
+    public void setPrivKey(String privKey) {
+        this.privKey = privKey;
     }
 }

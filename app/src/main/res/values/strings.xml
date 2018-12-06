@@ -186,7 +186,9 @@
     <string name="transfer_qr_scan_error">Did not find a valid seed</string>
     <string name="transfer_no_funds_toast">This QR does not have any BANANO on it.</string>
     <!-- Confirm Screen -->
-    <string name="transfer_confirm_info">A wallet with a balance of %s BANANO has been detected.\nTap confirm to transfer the funds.\n\nTransfer may take several seconds to complete.</string>
+    <string name="transfer_confirm_info_first">A wallet with a balance of %s BANANO has been detected.</string>
+    <string name="transfer_confirm_info_second">Tap confirm to transfer the funds.</string>
+    <string name="transfer_confirm_info_third">Transfer may take several seconds to complete.</string>
 
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">Scan a Banano \naddress QR code</string>

@@ -13,13 +13,20 @@ import android.view.WindowManager;
 import com.banano.kaliumwallet.R;
 import com.banano.kaliumwallet.bus.RxBus;
 import com.banano.kaliumwallet.databinding.FragmentTransferConfirmBinding;
+import com.banano.kaliumwallet.network.model.response.AccountBalanceItem;
 import com.banano.kaliumwallet.ui.common.ActivityWithComponent;
 import com.banano.kaliumwallet.ui.common.BaseDialogFragment;
 import com.banano.kaliumwallet.ui.common.SwipeDismissTouchListener;
 import com.banano.kaliumwallet.ui.common.UIUtil;
+import com.banano.kaliumwallet.util.NumberUtil;
+
+import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
 
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
+import timber.log.Timber;
 
 /**
  * Initial Transfer Screen
@@ -34,8 +41,9 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
      *
      * @return New instance of ChangeRepDialogFragment
      */
-    public static TransferConfirmDialogFragment newInstance() {
+    public static TransferConfirmDialogFragment newInstance(HashMap<String, AccountBalanceItem> privKeyMap) {
         Bundle args = new Bundle();
+        args.putSerializable("PRIVKEYMAP", privKeyMap);
         TransferConfirmDialogFragment fragment = new TransferConfirmDialogFragment();
         fragment.setArguments(args);
         return fragment;
@@ -97,6 +105,25 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
 
         // subscribe to bus
         RxBus.get().register(this);
+
+        // Determine how much is here and sum it up
+        HashMap<String, AccountBalanceItem> privKeyMap = new HashMap<>();
+        if (getArguments().getSerializable("PRIVKEYMAP") != null) {
+            privKeyMap = (HashMap<String, AccountBalanceItem>) getArguments().getSerializable("PRIVKEYMAP");
+        }
+        BigInteger totalSum = new BigInteger("0");
+        for (Map.Entry<String, AccountBalanceItem> item : privKeyMap.entrySet()) {
+            AccountBalanceItem balances = item.getValue();
+            BigInteger balance = new BigInteger(balances.getBalance());
+            BigInteger pending = new BigInteger(balances.getPending());
+            Timber.d("BALANCE:" + balances.getBalance());
+            Timber.d("PENDING:" + balances.getPending());
+            totalSum.add(balance);
+            totalSum.add(pending);
+        }
+        String totalAsReadable = NumberUtil.getRawAsUsableString(totalSum.toString());
+
+        binding.transferConfirmOne.setText(getString(R.string.transfer_confirm_info_first, totalAsReadable));
 
         return view;
     }

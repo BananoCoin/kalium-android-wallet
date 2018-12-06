@@ -38,9 +38,9 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/transfer_confirm_details"
+            android:id="@+id/transfer_confirm_one"
             style="@style/TextStyleParagraph"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="start"
             android:layout_marginTop="30dp"
@@ -51,7 +51,38 @@
             app:layout_constraintEnd_toStartOf="@+id/transfer_confirm_guideline_vert"
             app:layout_constraintStart_toStartOf="@+id/transfer_confirm_guideline_vert"
             app:layout_constraintTop_toBottomOf="@+id/transfer_confirm_header"
-            tools:text="@string/transfer_confirm_info" />
+            tools:text="@string/transfer_confirm_info_first" />
+
+        <TextView
+            android:id="@+id/transfer_confirm_two"
+            style="@style/TextStyleParagraphBold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:paddingLeft="50dp"
+            android:paddingRight="50dp"
+            android:textSize="@dimen/address_text_size"
+            android:text="@string/transfer_confirm_info_second"
+            app:layout_constraintEnd_toStartOf="@+id/transfer_confirm_guideline_vert"
+            app:layout_constraintStart_toStartOf="@+id/transfer_confirm_guideline_vert"
+            app:layout_constraintTop_toBottomOf="@+id/transfer_confirm_one" />
+
+
+        <TextView
+            android:id="@+id/transfer_confirm_three"
+            style="@style/TextStyleParagraph"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white_90"
+            android:gravity="start"
+            android:layout_marginTop="15dp"
+            android:paddingLeft="50dp"
+            android:paddingRight="50dp"
+            android:textSize="@dimen/address_text_size"
+            android:text="@string/transfer_confirm_info_third"
+            app:layout_constraintEnd_toStartOf="@+id/transfer_confirm_guideline_vert"
+            app:layout_constraintStart_toStartOf="@+id/transfer_confirm_guideline_vert"
+            app:layout_constraintTop_toBottomOf="@+id/transfer_confirm_two"/>
 
         <Button
             android:id="@+id/transfer_confirm"
