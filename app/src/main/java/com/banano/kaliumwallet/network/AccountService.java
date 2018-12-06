@@ -140,6 +140,7 @@ public class AccountService {
             @Override
             public void onOpen(ServerHandshake handshakedata) {
                 Timber.d("OPENED");
+                processQueue();
                 requestUpdate();
             }
 
@@ -547,7 +548,7 @@ public class AccountService {
                 requestItem.setProcessing(true);
 
                 Timber.d("SEND: %s", gson.toJson(requestItem.getRequest()));
-                wsSend(gson.toJson(requestItem.getRequest()));
+                wsSend(gson.toJson(requestItem.getRequest()), requestItem);
             } else if (requestItem != null && (requestItem.isProcessing() && System.currentTimeMillis() > requestItem.getExpireTime())) {
                 // expired request on the queue so remove and go to the next
                 requestQueue.poll();
@@ -609,11 +610,7 @@ public class AccountService {
             return false;
         }
         requestQueue.add(new RequestItem<>(new AccountsBalancesRequest(accounts)));
-        if (wsDisconnected()) {
-            initWebSocket();
-        } else {
-            processQueue();
-        }
+        processQueue();
         return true;
     }
 
@@ -896,10 +893,15 @@ public class AccountService {
         }
     }
 
-    private void wsSend(String message) {
+    private void wsSend(String message, RequestItem item) {
         checkState();
         if (websocket.isOpen()) {
             websocket.send(message);
+        } else {
+            // Re-put this message on queue
+            requestQueue.poll();
+            item.setProcessing(false);
+            requestQueue.add(item);
         }
     }
 }

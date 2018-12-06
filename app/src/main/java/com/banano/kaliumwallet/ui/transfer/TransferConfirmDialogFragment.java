@@ -116,10 +116,7 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
             AccountBalanceItem balances = item.getValue();
             BigInteger balance = new BigInteger(balances.getBalance());
             BigInteger pending = new BigInteger(balances.getPending());
-            Timber.d("BALANCE:" + balances.getBalance());
-            Timber.d("PENDING:" + balances.getPending());
-            totalSum.add(balance);
-            totalSum.add(pending);
+            totalSum = totalSum.add(balance).add(pending);
         }
         String totalAsReadable = NumberUtil.getRawAsUsableString(totalSum.toString());
 

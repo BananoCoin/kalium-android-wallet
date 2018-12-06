@@ -3,7 +3,9 @@ package com.banano.kaliumwallet.network.model.response;
 import com.banano.kaliumwallet.network.model.BaseResponse;
 import com.google.gson.annotations.SerializedName;
 
-public class AccountBalanceItem extends BaseResponse {
+import java.io.Serializable;
+
+public class AccountBalanceItem extends BaseResponse implements Serializable {
     @SerializedName("balance")
     private String balance;
 
