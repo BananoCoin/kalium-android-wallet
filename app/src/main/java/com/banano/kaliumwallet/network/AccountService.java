@@ -392,6 +392,8 @@ public class AccountService {
      */
     private void handleAccountsBalancesResponse(AccountsBalancesResponse balancesResponse) {
         post(balancesResponse);
+        requestQueue.poll();
+        processQueue();
     }
 
 
@@ -539,10 +541,6 @@ public class AccountService {
      */
     private void processQueue() {
         if (requestQueue != null && requestQueue.size() > 0) {
-            if (wsDisconnected()) {
-                requestQueue.clear();
-                return;
-            }
             RequestItem requestItem = requestQueue.peek();
             if (requestItem != null && !requestItem.isProcessing()) {
                 // process item
@@ -574,7 +572,7 @@ public class AccountService {
      * Request subscribe
      */
     public void requestSubscribe() {
-        if (address != null && address.getAddress() != null) {
+        if (address != null && address.getAddress() != null && !wsDisconnected()) {
             requestQueue.add(new RequestItem<>(new SubscribeRequest(address.getAddress(), getLocalCurrency(), wallet.getUuid(), sharedPreferencesUtil.getFcmToken())));
             processQueue();
         }
@@ -611,7 +609,11 @@ public class AccountService {
             return false;
         }
         requestQueue.add(new RequestItem<>(new AccountsBalancesRequest(accounts)));
-        processQueue();
+        if (wsDisconnected()) {
+            initWebSocket();
+        } else {
+            processQueue();
+        }
         return true;
     }
 

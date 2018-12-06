@@ -15,6 +15,7 @@ import com.banano.kaliumwallet.KaliumUtil;
 import com.banano.kaliumwallet.R;
 import com.banano.kaliumwallet.bus.RxBus;
 import com.banano.kaliumwallet.databinding.FragmentTransferBinding;
+import com.banano.kaliumwallet.model.KaliumWallet;
 import com.banano.kaliumwallet.network.AccountService;
 import com.banano.kaliumwallet.network.model.response.AccountBalanceItem;
 import com.banano.kaliumwallet.network.model.response.AccountsBalancesResponse;
@@ -38,6 +39,7 @@ import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
+import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -50,10 +52,12 @@ public class TransferIntroDialogFragment extends BaseDialogFragment {
 
     @Inject
     AccountService accountService;
+    @Inject
+    KaliumWallet wallet;
 
     private FragmentTransferBinding binding;
 
-    private HashMap<String, String> accountPrivkeyMap = new HashMap<>();
+    private HashMap<String, AccountBalanceItem> accountPrivkeyMap = new HashMap<>();
 
     /**
      * Create new instance of the dialog fragment (handy pattern if any data needs to be passed to it)
@@ -146,17 +150,30 @@ public class TransferIntroDialogFragment extends BaseDialogFragment {
                     String result = res.getString(ScanActivity.QR_CODE_RESULT);
 
                     String privKey;
+                    String pubKey;
                     String account;
                     if (NanoSeeds.isValid(NanoHelper.toByteArray(result))) {
+                        List<String> accountsToRequest = new ArrayList<>();
                         for (int i = 0; i < NUM_SWEEP; i++) {
                             privKey = KaliumUtil.seedToPrivate(result, i);
-                            account = KaliumUtil.publicToAddress(KaliumUtil.privateToPublic(privKey));
-                            accountPrivkeyMap.put(account, privKey);
+                            pubKey = KaliumUtil.privateToPublic(privKey);
+                            account = KaliumUtil.publicToAddress(pubKey);
+                            // don't let them transfer from their own account
+                            if (pubKey.equals(wallet.getPublicKey())) {
+                                continue;
+                            }
+                            accountPrivkeyMap.put(account, new AccountBalanceItem());
+                            accountsToRequest.add(account);
                         }
                         // Also put the seed itself as a private key, in case thats the intention
-                        accountPrivkeyMap.put(result, KaliumUtil.publicToAddress(KaliumUtil.privateToPublic(result)));
+                        pubKey = KaliumUtil.privateToPublic(result);
+                        account =  KaliumUtil.publicToAddress(pubKey);
+                        // don't let them transfer from their own account
+                        if (!pubKey.equals(wallet.getPublicKey())) {
+                            accountPrivkeyMap.put(account, new AccountBalanceItem());
+                            accountsToRequest.add(account);
+                        }
                         // Make account balances request
-                        List<String> accountsToRequest = new ArrayList<>();
                         accountService.requestAccountsBalances(accountsToRequest);
                     }
                 }
@@ -174,7 +191,13 @@ public class TransferIntroDialogFragment extends BaseDialogFragment {
             BigInteger pending = new BigInteger(balances.getPending());
             if (balance.add(pending).equals(BigInteger.ZERO)) {
                 accountPrivkeyMap.remove(account);
+            } else {
+                accountPrivkeyMap.put(account, balances);
             }
+        }
+        if (accountPrivkeyMap.size() == 0) {
+            UIUtil.showToast(getString(R.string.transfer_no_funds_toast), getContext());
+            return;
         }
     }
 

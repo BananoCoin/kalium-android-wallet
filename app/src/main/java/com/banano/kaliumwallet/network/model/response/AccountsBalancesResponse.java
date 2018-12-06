@@ -16,7 +16,7 @@ public class AccountsBalancesResponse extends BaseResponse {
         return balances;
     }
 
-    public void setBlocks(HashMap<String, AccountBalanceItem> balances) {
+    public void setBalances(HashMap<String, AccountBalanceItem> balances) {
         this.balances = balances;
     }
 }

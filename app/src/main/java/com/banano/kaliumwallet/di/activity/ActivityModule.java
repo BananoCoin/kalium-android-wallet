@@ -9,6 +9,7 @@ import com.banano.kaliumwallet.network.model.BaseResponse;
 import com.banano.kaliumwallet.network.model.BlockTypes;
 import com.banano.kaliumwallet.network.model.response.AccountCheckResponse;
 import com.banano.kaliumwallet.network.model.response.AccountHistoryResponse;
+import com.banano.kaliumwallet.network.model.response.AccountsBalancesResponse;
 import com.banano.kaliumwallet.network.model.response.BlockResponse;
 import com.banano.kaliumwallet.network.model.response.BlocksInfoResponse;
 import com.banano.kaliumwallet.network.model.response.CurrentPriceResponse;
@@ -115,6 +116,18 @@ public class ActivityModule {
                                     }
                                 }
                             }
+                        } else if (src.getAsJsonObject().get("balances") != null) {
+                            JsonElement balancesElement = src.getAsJsonObject().get("balances");
+                            if (balancesElement.isJsonObject()) {
+                                JsonObject balances = balancesElement.getAsJsonObject();
+                                String key = balances.keySet().iterator().next();
+                                if (key != null) {
+                                    if (balances.get(key).getAsJsonObject().has("pending")) {
+                                        // accounts_balances response
+                                        src.getAsJsonObject().addProperty("messageType", Actions.BALANCES.toString());
+                                    }
+                                }
+                            }
                         } else if (src.getAsJsonObject().get("representative") != null) {
                             src.getAsJsonObject().addProperty("messageType", Actions.REPRESENTATIVE.toString());
                         }
@@ -141,6 +154,8 @@ public class ActivityModule {
                             return ProcessResponse.class;
                         } else if (kind.equals(Actions.GET_BLOCKS_INFO.toString())) {
                             return BlocksInfoResponse.class;
+                        } else if (kind.equals(Actions.BALANCES.toString())) {
+                            return AccountsBalancesResponse.class;
                         } else if (kind.equals("block")) {
                             return TransactionResponse.class;
                         } else if (kind.equals("contents")) {
