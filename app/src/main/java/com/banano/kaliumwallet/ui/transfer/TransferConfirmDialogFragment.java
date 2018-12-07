@@ -26,7 +26,6 @@ import java.util.Map;
 
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
-import timber.log.Timber;
 
 /**
  * Initial Transfer Screen
@@ -137,6 +136,11 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
             binding.transferConfirm.setEnabled(false);
             binding.transferCancel.setEnabled(false);
             animateView(binding.progressOverlay, View.VISIBLE, 1, 200);
+            // Darken window further
+            Window window = getDialog().getWindow();
+            WindowManager.LayoutParams windowParams = window.getAttributes();
+            windowParams.dimAmount = 0.90f;
+            window.setAttributes(windowParams);
         }
     }
 
