@@ -159,7 +159,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:layout_marginBottom="150dp"
+                android:layout_marginBottom="140dp"
                 android:textAllCaps="true"
                 android:fontFamily="@font/nunitosans_bold"
                 android:textSize="32sp"

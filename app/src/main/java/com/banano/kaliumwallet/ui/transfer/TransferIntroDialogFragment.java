@@ -140,6 +140,29 @@ public class TransferIntroDialogFragment extends BaseDialogFragment {
         RxBus.get().unregister(this);
     }
 
+    private void showLoadingOverlay() {
+        if (binding != null && binding.progressOverlay != null) {
+            binding.transferScanQr.setEnabled(false);
+            animateView(binding.progressOverlay, View.VISIBLE, 1, 200);
+            // Darken window further
+            Window window = getDialog().getWindow();
+            WindowManager.LayoutParams windowParams = window.getAttributes();
+            windowParams.dimAmount = 0.90f;
+            window.setAttributes(windowParams);
+        }
+    }
+
+    private void hideLoadingOverlay() {
+        if (binding != null && binding.progressOverlay != null) {
+            animateView(binding.progressOverlay, View.GONE, 0, 200);
+            // Lighten window again
+            Window window = getDialog().getWindow();
+            WindowManager.LayoutParams windowParams = window.getAttributes();
+            windowParams.dimAmount = 0.60f;
+            window.setAttributes(windowParams);
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == SCAN_RESULT) {
@@ -148,6 +171,7 @@ public class TransferIntroDialogFragment extends BaseDialogFragment {
                 Bundle res = data.getExtras();
                 if (res != null) {
                     String result = res.getString(ScanActivity.QR_CODE_RESULT);
+                    showLoadingOverlay();
 
                     String privKey;
                     String pubKey;
@@ -190,6 +214,7 @@ public class TransferIntroDialogFragment extends BaseDialogFragment {
     @Subscribe
     public void onAccountBalancesResponse(AccountsBalancesResponse accountsBalancesResponse) {
         HashMap<String, AccountBalanceItem> accountBalances = accountsBalancesResponse.getBalances();
+        hideLoadingOverlay();
         for (Map.Entry<String, AccountBalanceItem> item : accountBalances.entrySet()) {
             AccountBalanceItem balances = item.getValue();
             String account = item.getKey();
@@ -209,6 +234,7 @@ public class TransferIntroDialogFragment extends BaseDialogFragment {
             return;
         }
         showConfirmDialog();
+        dismiss();
     }
 
     public class ClickHandlers {
