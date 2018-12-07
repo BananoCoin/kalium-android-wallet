@@ -39,14 +39,14 @@
 
         <TextView
             android:id="@+id/transfer_confirm_one"
-            style="@style/TextStyleParagraph"
+            style="@style/TextStyleParagraphBold"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="start"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="50dp"
             android:paddingLeft="50dp"
             android:paddingRight="50dp"
-            android:textColor="@color/white_90"
+            android:textColor="@color/yellow"
             android:textSize="@dimen/address_text_size"
             app:layout_constraintEnd_toStartOf="@+id/transfer_confirm_guideline_vert"
             app:layout_constraintStart_toStartOf="@+id/transfer_confirm_guideline_vert"
@@ -55,13 +55,15 @@
 
         <TextView
             android:id="@+id/transfer_confirm_two"
-            style="@style/TextStyleParagraphBold"
+            style="@style/TextStyleParagraph"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
             android:gravity="start"
             android:paddingLeft="50dp"
             android:paddingRight="50dp"
             android:textSize="@dimen/address_text_size"
+            android:textColor="@color/white_90"
             android:text="@string/transfer_confirm_info_second"
             app:layout_constraintEnd_toStartOf="@+id/transfer_confirm_guideline_vert"
             app:layout_constraintStart_toStartOf="@+id/transfer_confirm_guideline_vert"
@@ -75,7 +77,7 @@
             android:layout_height="wrap_content"
             android:textColor="@color/white_90"
             android:gravity="start"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="20dp"
             android:paddingLeft="50dp"
             android:paddingRight="50dp"
             android:textSize="@dimen/address_text_size"
@@ -125,29 +127,62 @@
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.5" />
 
-        <RelativeLayout
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/progress_overlay"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:animateLayoutChanges="true"
-            android:background="@drawable/bg_rounded_black_transparent"
+            android:background="@drawable/bg_rounded_black_transparent_darker"
             android:clickable="true"
             android:elevation="5dp"
             android:focusable="true"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:visibility="gone">
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/animation_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:paddingTop="100dp"
+                android:paddingStart="30dp"
+                android:paddingEnd="30dp"
                 app:lottie_autoPlay="true"
                 app:lottie_loop="true"
-                app:lottie_rawRes="@raw/send_anim" />
+                app:lottie_rawRes="@raw/transfer_animation"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/transfer_load_text"
+                app:layout_constraintVertical_chainStyle="packed"/>
 
-        </RelativeLayout>
+            <TextView
+                android:id="@+id/transfer_load_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="150dp"
+                android:textAllCaps="true"
+                android:fontFamily="@font/nunitosans_bold"
+                android:textSize="32sp"
+                android:textColor="@color/yellow"
+                android:text="@string/transfer_loading_text"
+                app:layout_constraintTop_toBottomOf="@+id/animation_view"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/threedot_animation"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_chainStyle="packed" />
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/threedot_animation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
+                app:lottie_rawRes="@raw/threedot_animation"
+                app:layout_constraintBottom_toBottomOf="@+id/transfer_load_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/transfer_load_text"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

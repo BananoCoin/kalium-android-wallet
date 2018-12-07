@@ -87,6 +87,7 @@ public class AccountService {
     private LinkedList<RequestItem> requestQueue = new LinkedList<>();
     private String private_key;
     private Address address;
+    private boolean isConnecting = false;
 
     // Map previous hash to the block request
     private HashMap<String, StateBlock> previousPendingMap = new HashMap<>();
@@ -125,6 +126,8 @@ public class AccountService {
         if (websocket != null && websocket.isOpen()) {
             processQueue();
             return;
+        } else if (isConnecting) {
+            return;
         }
         // create websocket
         URI wssUri;
@@ -139,8 +142,8 @@ public class AccountService {
         websocket = new WebSocketClient(wssUri, httpHeaders) {
             @Override
             public void onOpen(ServerHandshake handshakedata) {
+                isConnecting = false;
                 Timber.d("OPENED");
-                processQueue();
                 requestUpdate();
             }
 
@@ -152,6 +155,7 @@ public class AccountService {
 
             @Override
             public void onClose(int code, String reason, boolean remote) {
+                isConnecting = false;
                 switch (code) {
                     case 1000: // CLOSE_NORMAL
                         Timber.d("CLOSED");
@@ -176,6 +180,7 @@ public class AccountService {
         };
         websocket.setConnectionLostTimeout(5);
         websocket.connect();
+        isConnecting = true;
     }
 
     /**
@@ -545,10 +550,16 @@ public class AccountService {
             RequestItem requestItem = requestQueue.peek();
             if (requestItem != null && !requestItem.isProcessing()) {
                 // process item
+                if (wsDisconnected()) {
+                    if (!isConnecting) {
+                        initWebSocket();
+                    }
+                    return;
+                }
                 requestItem.setProcessing(true);
 
                 Timber.d("SEND: %s", gson.toJson(requestItem.getRequest()));
-                wsSend(gson.toJson(requestItem.getRequest()), requestItem);
+                wsSend(gson.toJson(requestItem.getRequest()));
             } else if (requestItem != null && (requestItem.isProcessing() && System.currentTimeMillis() > requestItem.getExpireTime())) {
                 // expired request on the queue so remove and go to the next
                 requestQueue.poll();
@@ -888,20 +899,19 @@ public class AccountService {
     }
 
     private void checkState() {
-        if (wsDisconnected()) {
+        if (wsDisconnected() && !isConnecting) {
             initWebSocket();
         }
     }
 
-    private void wsSend(String message, RequestItem item) {
+    private void wsSend(String message) {
         checkState();
         if (websocket.isOpen()) {
             websocket.send(message);
         } else {
-            // Re-put this message on queue
-            requestQueue.poll();
-            item.setProcessing(false);
-            requestQueue.add(item);
+            for (RequestItem item : requestQueue) {
+                item.setProcessing(false);
+            }
         }
     }
 }

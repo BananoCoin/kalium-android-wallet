@@ -10,6 +10,7 @@
     <color name="black_40">#64000000</color>
     <color name="black_60">#96000000</color>
     <color name="black_70">#B3000000</color>
+    <color name="black_85">#D9000000</color>
     <color name="gray_element">#1A1A1C</color>
     <color name="gray_dark">#212124</color>
     <color name="gray_dark_60">#96212124</color>

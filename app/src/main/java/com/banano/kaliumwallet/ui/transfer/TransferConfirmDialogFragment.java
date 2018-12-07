@@ -132,13 +132,27 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
         RxBus.get().unregister(this);
     }
 
+    private void showLoadingOverlay() {
+        if (binding != null && binding.progressOverlay != null) {
+            binding.transferConfirm.setEnabled(false);
+            binding.transferCancel.setEnabled(false);
+            animateView(binding.progressOverlay, View.VISIBLE, 1, 200);
+        }
+    }
+
+    private void hideLoadingOverlay() {
+        if (binding != null && binding.progressOverlay != null) {
+            animateView(binding.progressOverlay, View.GONE, 0, 200);
+        }
+    }
+
     public class ClickHandlers {
         public void onClickClose(View view) {
             dismiss();
         }
 
         public void onClickConfirm(View view) {
-            return;
+            showLoadingOverlay();
         }
     }
 }

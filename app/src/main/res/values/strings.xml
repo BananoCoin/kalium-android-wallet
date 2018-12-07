@@ -189,6 +189,7 @@
     <string name="transfer_confirm_info_first">A wallet with a balance of %s BANANO has been detected.</string>
     <string name="transfer_confirm_info_second">Tap confirm to transfer the funds.</string>
     <string name="transfer_confirm_info_third">Transfer may take several seconds to complete.</string>
+    <string name="transfer_loading_text">Transferring</string>
 
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">Scan a Banano \naddress QR code</string>
