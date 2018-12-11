@@ -1,5 +1,6 @@
 package com.banano.kaliumwallet.ui.transfer;
 
+import android.accounts.Account;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -13,12 +14,14 @@ import android.view.WindowManager;
 import com.banano.kaliumwallet.R;
 import com.banano.kaliumwallet.bus.RxBus;
 import com.banano.kaliumwallet.bus.TransferHistoryResponse;
+import com.banano.kaliumwallet.bus.TransferProcessResponse;
 import com.banano.kaliumwallet.databinding.FragmentTransferConfirmBinding;
 import com.banano.kaliumwallet.network.AccountService;
 import com.banano.kaliumwallet.network.model.response.AccountBalanceItem;
 import com.banano.kaliumwallet.network.model.response.AccountHistoryResponse;
 import com.banano.kaliumwallet.network.model.response.PendingTransactionResponse;
 import com.banano.kaliumwallet.network.model.response.PendingTransactionResponseItem;
+import com.banano.kaliumwallet.network.model.response.ProcessResponse;
 import com.banano.kaliumwallet.ui.common.ActivityWithComponent;
 import com.banano.kaliumwallet.ui.common.BaseDialogFragment;
 import com.banano.kaliumwallet.ui.common.SwipeDismissTouchListener;
@@ -191,23 +194,58 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
         accountService.requestPending(account);
     }
 
+    private void processNextPending(String account) {
+        // Get next pending block, if there is one
+        AccountBalanceItem accountBalanceItem = rawInMap.get(account);
+        PendingTransactionResponse pendingTransactionResponse = accountBalanceItem.getPendingTransactions();
+        HashMap<String, PendingTransactionResponseItem> pendingBlocks = pendingTransactionResponse.getBlocks();
+        if (pendingBlocks.size() > 0) {
+            Map.Entry<String, PendingTransactionResponseItem> entry = pendingBlocks.entrySet().iterator().next();
+            PendingTransactionResponseItem pendingTransactionResponseItem = entry.getValue();
+            pendingTransactionResponseItem.setHash(entry.getKey());
+            if (accountBalanceItem.getFrontier() != null) {
+                // Receive block
+                accountService.requestReceive(accountBalanceItem.getFrontier(),
+                                              pendingTransactionResponseItem.getHash(),
+                                              new BigInteger(pendingTransactionResponseItem.getAmount()),
+                                              accountBalanceItem.getPrivKey());
+            } else {
+                // Open account
+                accountService.requestOpen("0",
+                        pendingTransactionResponseItem.getHash(),
+                        new BigInteger(pendingTransactionResponseItem.getAmount()),
+                        accountBalanceItem.getPrivKey());
+            }
+            pendingBlocks.remove(entry.getKey());
+        } else {
+            readyToSendMap.put(account, accountBalanceItem);
+            rawInMap.remove(account);
+            startProcessing(); // Move on to next account
+        }
+    }
+
+    @Subscribe
+    public void onProcessResponse(TransferProcessResponse processResponse) {
+        // Update balance and frontier of this account
+        AccountBalanceItem accountBalanceItem = rawInMap.get(processResponse.getAccount());
+        accountBalanceItem.setFrontier(processResponse.getHash());
+        accountBalanceItem.setBalance(processResponse.getBalance());
+        rawInMap.put(processResponse.getAccount(), accountBalanceItem);
+        // Process next item
+        processNextPending(processResponse.getAccount());
+    }
+
     @Subscribe
     public void onPendingResponse(PendingTransactionResponse pendingTransactionResponse) {
         // Part 2 - pending to begin pocketing pending blocks
+
         // Store response for this account
         AccountBalanceItem balanceItem = rawInMap.get(pendingTransactionResponse.getAccount());
         balanceItem.setPendingTransactions(pendingTransactionResponse);
         rawInMap.put(pendingTransactionResponse.getAccount(), balanceItem);
-        // Iterate pending and request receive/open as many times as it takes.
-        for (Map.Entry<String, PendingTransactionResponseItem> itemEntry : pendingTransactionResponse.getBlocks().entrySet()) {
-            PendingTransactionResponseItem pendingTransactionResponseItem = itemEntry.getValue();
-            pendingTransactionResponseItem.setHash(itemEntry.getKey());
-            if (balanceItem.getFrontier() != null) {
-                // Request receive
-            } else {
-                // request open
-            }
-        }
+
+        // Begin open/receive for pendings
+        processNextPending(pendingTransactionResponse.getAccount());
     }
 
     private void startProcessing() {
