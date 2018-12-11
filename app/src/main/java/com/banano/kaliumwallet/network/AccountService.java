@@ -501,6 +501,7 @@ public class AccountService {
                         updateFrontier(processResponse.getHash());
                         updateBlockCount(1);
                     } else {
+                        updateFrontier(processResponse.getHash());
                         updateBlockCount(wallet.getBlockCount() + 1);
                         post(processResponse);
                     }
