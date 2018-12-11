@@ -12,17 +12,25 @@ import android.view.WindowManager;
 
 import com.banano.kaliumwallet.R;
 import com.banano.kaliumwallet.bus.RxBus;
+import com.banano.kaliumwallet.bus.TransferHistoryResponse;
 import com.banano.kaliumwallet.databinding.FragmentTransferConfirmBinding;
+import com.banano.kaliumwallet.network.AccountService;
 import com.banano.kaliumwallet.network.model.response.AccountBalanceItem;
+import com.banano.kaliumwallet.network.model.response.AccountHistoryResponse;
+import com.banano.kaliumwallet.network.model.response.PendingTransactionResponse;
+import com.banano.kaliumwallet.network.model.response.PendingTransactionResponseItem;
 import com.banano.kaliumwallet.ui.common.ActivityWithComponent;
 import com.banano.kaliumwallet.ui.common.BaseDialogFragment;
 import com.banano.kaliumwallet.ui.common.SwipeDismissTouchListener;
 import com.banano.kaliumwallet.ui.common.UIUtil;
 import com.banano.kaliumwallet.util.NumberUtil;
+import com.hwangjr.rxbus.annotation.Subscribe;
 
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
@@ -34,6 +42,12 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
     public static String TAG = TransferConfirmDialogFragment.class.getSimpleName();
 
     private FragmentTransferConfirmBinding binding;
+
+    @Inject
+    AccountService accountService;
+
+    HashMap<String, AccountBalanceItem> rawInMap;
+    HashMap<String, AccountBalanceItem> readyToSendMap;
 
     /**
      * Create new instance of the dialog fragment (handy pattern if any data needs to be passed to it)
@@ -106,16 +120,24 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
         RxBus.get().register(this);
 
         // Determine how much is here and sum it up
-        HashMap<String, AccountBalanceItem> privKeyMap = new HashMap<>();
+        // TODO avoid NPE and other exceptions by showing error messages
+        readyToSendMap = new HashMap<>();
         if (getArguments().getSerializable("PRIVKEYMAP") != null) {
-            privKeyMap = (HashMap<String, AccountBalanceItem>) getArguments().getSerializable("PRIVKEYMAP");
+            rawInMap = (HashMap<String, AccountBalanceItem>) getArguments().getSerializable("PRIVKEYMAP");
         }
         BigInteger totalSum = new BigInteger("0");
-        for (Map.Entry<String, AccountBalanceItem> item : privKeyMap.entrySet()) {
+        for (Map.Entry<String, AccountBalanceItem> item : rawInMap.entrySet()) {
             AccountBalanceItem balances = item.getValue();
             BigInteger balance = new BigInteger(balances.getBalance());
             BigInteger pending = new BigInteger(balances.getPending());
             totalSum = totalSum.add(balance).add(pending);
+            // If there's no pending here then we don't need to run a pocket/open routine
+            if (pending.equals(BigInteger.ZERO) && balance.compareTo(BigInteger.ZERO) > 0) {
+                readyToSendMap.put(item.getKey(), balances);
+                rawInMap.remove(item.getKey());
+            } else if (pending.equals(BigInteger.ZERO) && balance.equals(BigInteger.ZERO)) {
+                rawInMap.remove(item.getKey());
+            }
         }
         String totalAsReadable = NumberUtil.getRawAsUsableString(totalSum.toString());
 
@@ -150,6 +172,53 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
         }
     }
 
+    @Subscribe
+    public void onAccountHistoryResponse(TransferHistoryResponse transferHistoryResponse) {
+        // Part 1 - account_history to determine frontier
+        if (transferHistoryResponse == null) {
+            return;
+        }
+        String account = transferHistoryResponse.getAccount();
+        AccountHistoryResponse accountHistoryResponse = transferHistoryResponse.getAccountHistoryResponse();
+        AccountBalanceItem accountBalanceItem = rawInMap.get(account);
+        if (accountBalanceItem == null) {
+            return;
+        }
+        if (accountHistoryResponse.getHistory().size() > 0) {
+            accountBalanceItem.setFrontier(accountHistoryResponse.getHistory().get(0).getHash());
+            rawInMap.put(account, accountBalanceItem);
+        }
+        accountService.requestPending(account);
+    }
+
+    @Subscribe
+    public void onPendingResponse(PendingTransactionResponse pendingTransactionResponse) {
+        // Part 2 - pending to begin pocketing pending blocks
+        // Store response for this account
+        AccountBalanceItem balanceItem = rawInMap.get(pendingTransactionResponse.getAccount());
+        balanceItem.setPendingTransactions(pendingTransactionResponse);
+        rawInMap.put(pendingTransactionResponse.getAccount(), balanceItem);
+        // Iterate pending and request receive/open as many times as it takes.
+        for (Map.Entry<String, PendingTransactionResponseItem> itemEntry : pendingTransactionResponse.getBlocks().entrySet()) {
+            PendingTransactionResponseItem pendingTransactionResponseItem = itemEntry.getValue();
+            pendingTransactionResponseItem.setHash(itemEntry.getKey());
+            if (balanceItem.getFrontier() != null) {
+                // Request receive
+            } else {
+                // request open
+            }
+        }
+    }
+
+    private void startProcessing() {
+        if (rawInMap.size() > 0) {
+            Map.Entry<String, AccountBalanceItem> item = rawInMap.entrySet().iterator().next();
+            String account = item.getKey();
+            // Kick off account_history request
+            accountService.requestAccountHistory(account);
+        }
+    }
+
     public class ClickHandlers {
         public void onClickClose(View view) {
             dismiss();
@@ -157,6 +226,7 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
 
         public void onClickConfirm(View view) {
             showLoadingOverlay();
+            startProcessing();
         }
     }
 }

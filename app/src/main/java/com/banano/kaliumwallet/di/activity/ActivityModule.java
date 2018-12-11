@@ -14,6 +14,7 @@ import com.banano.kaliumwallet.network.model.response.BlockResponse;
 import com.banano.kaliumwallet.network.model.response.BlocksInfoResponse;
 import com.banano.kaliumwallet.network.model.response.CurrentPriceResponse;
 import com.banano.kaliumwallet.network.model.response.ErrorResponse;
+import com.banano.kaliumwallet.network.model.response.PendingTransactionResponse;
 import com.banano.kaliumwallet.network.model.response.ProcessResponse;
 import com.banano.kaliumwallet.network.model.response.SubscribeResponse;
 import com.banano.kaliumwallet.network.model.response.TransactionResponse;
@@ -113,6 +114,8 @@ public class ActivityModule {
                                     if (blocks.get(key).getAsJsonObject().has("block_account")) {
                                         // get blocks info response
                                         src.getAsJsonObject().addProperty("messageType", Actions.GET_BLOCKS_INFO.toString());
+                                    } else if (blocks.get(key).getAsJsonObject().has("source")) {
+                                        src.getAsJsonObject().addProperty("messageType", Actions.PENDING.toString());
                                     }
                                 }
                             }
@@ -156,6 +159,8 @@ public class ActivityModule {
                             return BlocksInfoResponse.class;
                         } else if (kind.equals(Actions.BALANCES.toString())) {
                             return AccountsBalancesResponse.class;
+                        } else if (kind.equals(Actions.PENDING.toString())) {
+                            return PendingTransactionResponse.class;
                         } else if (kind.equals("block")) {
                             return TransactionResponse.class;
                         } else if (kind.equals("contents")) {

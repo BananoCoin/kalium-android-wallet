@@ -14,7 +14,12 @@ public class AccountBalanceItem extends BaseResponse implements Serializable {
 
     private String privKey;
 
-    public AccountBalanceItem() { }
+    private String frontier;
+
+    private PendingTransactionResponse pendingTransactions;
+
+    public AccountBalanceItem() {
+    }
 
     public AccountBalanceItem(String privKey) {
         this.privKey = privKey;
@@ -42,5 +47,21 @@ public class AccountBalanceItem extends BaseResponse implements Serializable {
 
     public void setPrivKey(String privKey) {
         this.privKey = privKey;
+    }
+
+    public String getFrontier() {
+        return frontier;
+    }
+
+    public void setFrontier(String frontier) {
+        this.frontier = frontier;
+    }
+
+    public PendingTransactionResponse getPendingTransactions() {
+        return pendingTransactions;
+    }
+
+    public void setPendingTransactions(PendingTransactionResponse pendingTransactions) {
+        this.pendingTransactions = pendingTransactions;
     }
 }
