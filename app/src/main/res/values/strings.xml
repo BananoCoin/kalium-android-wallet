@@ -185,7 +185,8 @@
     <string name="transfer_intro">This process will transfer the funds from a paper wallet to your Kalium wallet.\n\nTap the \"%s\" button to start.</string>
     <string name="transfer_qr_scan_hint">Scan a Banano \nseed or private key</string>
     <string name="transfer_qr_scan_error">Did not find a valid seed</string>
-    <string name="transfer_no_funds_toast">This QR does not have any BANANO on it.</string>
+    <string name="transfer_no_funds_toast">This seed does not have any BANANO on it.</string>
+    <string name="transfer_already_used_toast">Funds from this seed have already been claimed.</string>
     <!-- Confirm Screen -->
     <string name="transfer_confirm_info_first">A wallet with a balance of %s BANANO has been detected.</string>
     <string name="transfer_confirm_info_second">Tap confirm to transfer the funds.</string>
