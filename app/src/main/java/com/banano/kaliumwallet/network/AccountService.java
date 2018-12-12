@@ -474,7 +474,7 @@ public class AccountService {
     }
 
     /**
-     * When an OPEN, SEND, or RECEIVE block comes back successfully with a hash
+     * When a STATE block comes back successfully with a hash
      *
      * @param processResponse Process Response
      */
@@ -799,7 +799,6 @@ public class AccountService {
      * @param amount     Amount to send in RAW
      */
     public void requestSend(String previous, Address destination, BigInteger amount) {
-
         StateBlock sendBlock = new StateBlock(
                             BlockTypes.SEND,
                             private_key,
@@ -812,6 +811,28 @@ public class AccountService {
 
         // Request block info for previous
         requestQueue.add(new RequestItem<>(new GetBlocksInfoRequest(new String[]{previous})));
+
+        processQueue();
+    }
+
+    public void requestSend(String previous, Address destination, BigInteger amount, String privKey) {
+        String representative = sharedPreferencesUtil.hasCustomRepresentative() ? sharedPreferencesUtil.getCustomRepresentative() : PreconfiguredRepresentatives.getRepresentative();
+
+        StateBlock sendBlock = new StateBlock(
+                BlockTypes.SEND,
+                privKey,
+                previous,
+                representative,
+                amount.toString(),
+                destination.getAddress()
+        );
+        previousPendingMap.put(previous, sendBlock);
+
+        // Request block info for previous
+        GetBlocksInfoRequest gbiq = new GetBlocksInfoRequest(new String[]{previous});
+        RequestItem<GetBlocksInfoRequest> requestItem = new RequestItem<>(gbiq);
+        requestItem.setFromTransfer(true);
+        requestQueue.add(requestItem);
 
         processQueue();
     }

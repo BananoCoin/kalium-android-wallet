@@ -1,6 +1,5 @@
 package com.banano.kaliumwallet.ui.transfer;
 
-import android.accounts.Account;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -16,16 +15,18 @@ import com.banano.kaliumwallet.bus.RxBus;
 import com.banano.kaliumwallet.bus.TransferHistoryResponse;
 import com.banano.kaliumwallet.bus.TransferProcessResponse;
 import com.banano.kaliumwallet.databinding.FragmentTransferConfirmBinding;
+import com.banano.kaliumwallet.model.Address;
+import com.banano.kaliumwallet.model.Credentials;
 import com.banano.kaliumwallet.network.AccountService;
 import com.banano.kaliumwallet.network.model.response.AccountBalanceItem;
 import com.banano.kaliumwallet.network.model.response.AccountHistoryResponse;
 import com.banano.kaliumwallet.network.model.response.PendingTransactionResponse;
 import com.banano.kaliumwallet.network.model.response.PendingTransactionResponseItem;
-import com.banano.kaliumwallet.network.model.response.ProcessResponse;
 import com.banano.kaliumwallet.ui.common.ActivityWithComponent;
 import com.banano.kaliumwallet.ui.common.BaseDialogFragment;
 import com.banano.kaliumwallet.ui.common.SwipeDismissTouchListener;
 import com.banano.kaliumwallet.ui.common.UIUtil;
+import com.banano.kaliumwallet.ui.common.WindowControl;
 import com.banano.kaliumwallet.util.NumberUtil;
 import com.hwangjr.rxbus.annotation.Subscribe;
 
@@ -37,17 +38,36 @@ import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
+import io.realm.Realm;
+import timber.log.Timber;
 
 /**
- * Initial Transfer Screen
+ * Transfer confirmation screen - the majority of the work happens here
+ *
+ * Process:
+ *  1) Take the input HashMap, which contains address->info mapping.
+ *     For accounts with no pending funds, move these to a second internal HashMap for "readyToSend"
+ *  2) For remaining accounts (with pending balances), the following algorithm is applied:
+ *      a) Request account_history, this gives us the frontier of the account or an empty string
+ *         if the account has no blocks (is not open)
+ *      b) Request pending, to get a list of all pending blocks this account has
+ *      c) If closed, request open. When process response received, create additional receive
+ *         blocks as necessary in a synchronized fashion. Updating the frontier along the way.
+ *      d) When no pending blocks remain (or we've reached the limit we're willing to process),
+ *         then move this address->info map into the "readyToSend" map. And process the next
+ *         pending account
+ *  3) For the "readyToSend" accounts, create a send for the entire balance of each. One at a time.
  */
 public class TransferConfirmDialogFragment extends BaseDialogFragment {
     public static String TAG = TransferConfirmDialogFragment.class.getSimpleName();
 
     private FragmentTransferConfirmBinding binding;
+    private BigInteger totalTransfered = new BigInteger("0");
 
     @Inject
     AccountService accountService;
+    @Inject
+    Realm realm;
 
     HashMap<String, AccountBalanceItem> rawInMap;
     HashMap<String, AccountBalanceItem> readyToSendMap;
@@ -123,10 +143,12 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
         RxBus.get().register(this);
 
         // Determine how much is here and sum it up
-        // TODO avoid NPE and other exceptions by showing error messages
         readyToSendMap = new HashMap<>();
         if (getArguments().getSerializable("PRIVKEYMAP") != null) {
             rawInMap = (HashMap<String, AccountBalanceItem>) getArguments().getSerializable("PRIVKEYMAP");
+        } else {
+            Timber.d("Input map is null");
+            exitWithError();
         }
         BigInteger totalSum = new BigInteger("0");
         for (Map.Entry<String, AccountBalanceItem> item : rawInMap.entrySet()) {
@@ -175,16 +197,40 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
         }
     }
 
+    private void exitWithError() {
+        UIUtil.showToast(getString(R.string.transfer_error), getContext());
+        dismiss();
+    }
+
+    private void showCompleteDialog() {
+        TransferCompleteDialogFragment dialog = TransferCompleteDialogFragment.newInstance(NumberUtil.getRawAsUsableString(totalTransfered.toString()));
+        dialog.show(((WindowControl) getActivity()).getFragmentUtility().getFragmentManager(),
+                TransferCompleteDialogFragment.TAG);
+        ((WindowControl) getActivity()).getFragmentUtility().getFragmentManager().executePendingTransactions();
+        dismiss();
+    }
+
+    /**
+     * onAccountHistoryResponse()
+     *
+     * Callback for account_history. Set the frontier of the account requested, if it's open.
+     * Trigger the pending request for this account
+     *
+     * @param transferHistoryResponse
+     */
     @Subscribe
     public void onAccountHistoryResponse(TransferHistoryResponse transferHistoryResponse) {
-        // Part 1 - account_history to determine frontier
         if (transferHistoryResponse == null) {
+            Timber.d("account_history response is null");
+            exitWithError();
             return;
         }
         String account = transferHistoryResponse.getAccount();
         AccountHistoryResponse accountHistoryResponse = transferHistoryResponse.getAccountHistoryResponse();
         AccountBalanceItem accountBalanceItem = rawInMap.get(account);
         if (accountBalanceItem == null) {
+            Timber.d("Couldn't find account %s in rawInMap", account);
+            exitWithError();
             return;
         }
         if (accountHistoryResponse.getHistory().size() > 0) {
@@ -194,6 +240,69 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
         accountService.requestPending(account);
     }
 
+    /**
+     * onPendingResponse()
+     *
+     * Callback for pending. Begin creating open/receive blocks for this account
+     *
+     * @param pendingTransactionResponse
+     */
+    @Subscribe
+    public void onPendingResponse(PendingTransactionResponse pendingTransactionResponse) {
+        // Store response for this account
+        AccountBalanceItem balanceItem = rawInMap.get(pendingTransactionResponse.getAccount());
+        if (balanceItem == null) {
+            Timber.d("Couldn't find account in pending response %s", pendingTransactionResponse.getAccount());
+            exitWithError();
+            return;
+        }
+        balanceItem.setPendingTransactions(pendingTransactionResponse);
+        rawInMap.put(pendingTransactionResponse.getAccount(), balanceItem);
+
+        // Begin open/receive for pendings
+        processNextPending(pendingTransactionResponse.getAccount());
+    }
+
+    /**
+     * onProcessResponse()
+     *
+     * Callback for process (block). Update frontier for account and move on to next pending block
+     * request. If from a send, move on to next account to send to
+     *
+     * @param processResponse
+     */
+    @Subscribe
+    public void onProcessResponse(TransferProcessResponse processResponse) {
+        // Update balance and frontier of this account
+        AccountBalanceItem accountBalanceItem = rawInMap.get(processResponse.getAccount());
+        if (accountBalanceItem != null) {
+            accountBalanceItem.setFrontier(processResponse.getHash());
+            accountBalanceItem.setBalance(processResponse.getBalance());
+            rawInMap.put(processResponse.getAccount(), accountBalanceItem);
+            // Process next item
+            processNextPending(processResponse.getAccount());
+        } else {
+            accountBalanceItem = readyToSendMap.get(processResponse.getAccount());
+            if (accountBalanceItem == null) {
+                Timber.d("Couldn't find account in readyToSend map %s", processResponse.getAccount());
+                exitWithError();
+                return;
+            }
+            totalTransfered = totalTransfered.add(new BigInteger(accountBalanceItem.getBalance()));
+            readyToSendMap.remove(processResponse.getAccount());
+            startProcessing();
+        }
+    }
+
+    /**
+     * processNextPending()
+     *
+     * Take the next pending block for this account and make a process request for an open/receive
+     * If there are no more pendings, move the account to "readyToSend" and begin processing next
+     * account.
+     *
+     * @param account
+     */
     private void processNextPending(String account) {
         // Get next pending block, if there is one
         AccountBalanceItem accountBalanceItem = rawInMap.get(account);
@@ -206,9 +315,9 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
             if (accountBalanceItem.getFrontier() != null) {
                 // Receive block
                 accountService.requestReceive(accountBalanceItem.getFrontier(),
-                                              pendingTransactionResponseItem.getHash(),
-                                              new BigInteger(pendingTransactionResponseItem.getAmount()),
-                                              accountBalanceItem.getPrivKey());
+                        pendingTransactionResponseItem.getHash(),
+                        new BigInteger(pendingTransactionResponseItem.getAmount()),
+                        accountBalanceItem.getPrivKey());
             } else {
                 // Open account
                 accountService.requestOpen("0",
@@ -224,36 +333,34 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
         }
     }
 
-    @Subscribe
-    public void onProcessResponse(TransferProcessResponse processResponse) {
-        // Update balance and frontier of this account
-        AccountBalanceItem accountBalanceItem = rawInMap.get(processResponse.getAccount());
-        accountBalanceItem.setFrontier(processResponse.getHash());
-        accountBalanceItem.setBalance(processResponse.getBalance());
-        rawInMap.put(processResponse.getAccount(), accountBalanceItem);
-        // Process next item
-        processNextPending(processResponse.getAccount());
-    }
-
-    @Subscribe
-    public void onPendingResponse(PendingTransactionResponse pendingTransactionResponse) {
-        // Part 2 - pending to begin pocketing pending blocks
-
-        // Store response for this account
-        AccountBalanceItem balanceItem = rawInMap.get(pendingTransactionResponse.getAccount());
-        balanceItem.setPendingTransactions(pendingTransactionResponse);
-        rawInMap.put(pendingTransactionResponse.getAccount(), balanceItem);
-
-        // Begin open/receive for pendings
-        processNextPending(pendingTransactionResponse.getAccount());
-    }
-
+    /**
+     * startProcessing()
+     * Make the initial or next account_history request, if there's accounts with pending funds.
+     * Otherwise make the initial or next send request, if there's no accounts with pending funds.
+     * - This just kicks off the request, the above callbacks will continue the processing
+     */
     private void startProcessing() {
         if (rawInMap.size() > 0) {
             Map.Entry<String, AccountBalanceItem> item = rawInMap.entrySet().iterator().next();
             String account = item.getKey();
             // Kick off account_history request
             accountService.requestAccountHistory(account);
+        } else if (readyToSendMap.size() > 0) {
+            // Start requesting sends
+            Map.Entry<String, AccountBalanceItem> item = readyToSendMap.entrySet().iterator().next();
+            AccountBalanceItem info = item.getValue();
+            Credentials credentials = realm.where(Credentials.class).findFirst();
+            Address destination;
+            if (credentials != null) {
+                destination = new Address(credentials.getAddressString());
+            } else {
+                Timber.d("couldn't find address from realm");
+                exitWithError();
+                return;
+            }
+            accountService.requestSend(info.getFrontier(), destination, new BigInteger("0"), info.getPrivKey());
+        } else {
+            showCompleteDialog();
         }
     }
 

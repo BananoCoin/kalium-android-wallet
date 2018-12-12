@@ -179,6 +179,7 @@
     <!-- Transfer Funds -->
     <!-- Settings Menu -->
     <string name="settings_transfer">Load from Paper Wallet</string>
+    <string name="transfer_error">An error has occurred during the transfer. Please try again later.</string>
     <!-- Initial Screen -->
     <string name="transfer_header">Transfer\nFunds:</string>
     <string name="transfer_intro">This process will transfer the funds from a paper wallet to your Kalium wallet.\n\nTap the \"%s\" button to start.</string>
@@ -190,6 +191,9 @@
     <string name="transfer_confirm_info_second">Tap confirm to transfer the funds.</string>
     <string name="transfer_confirm_info_third">Transfer may take several seconds to complete.</string>
     <string name="transfer_loading_text">Transferring</string>
+    <!-- Complete Screen -->
+    <string name="transfer_complete_text">%s BANANO has been successfully transferred to your Kalium Wallet.</string>
+    <string name="transfer_close_text">Tap anywhere to close the window.</string>
 
     <!-- Scan Screen -->
     <string name="scan_send_instruction_label">Scan a Banano \naddress QR code</string>
