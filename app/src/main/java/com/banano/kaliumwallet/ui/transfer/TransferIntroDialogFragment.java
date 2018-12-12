@@ -3,6 +3,7 @@ package com.banano.kaliumwallet.ui.transfer;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -129,6 +130,11 @@ public class TransferIntroDialogFragment extends BaseDialogFragment {
 
         // subscribe to bus
         RxBus.get().register(this);
+
+        // Lottie hardware acceleration
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            binding.animationView.useHardwareAcceleration(true);
+        }
 
         return view;
     }

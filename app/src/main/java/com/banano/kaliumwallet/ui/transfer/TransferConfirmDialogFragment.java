@@ -2,6 +2,7 @@ package com.banano.kaliumwallet.ui.transfer;
 
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -17,11 +18,13 @@ import com.banano.kaliumwallet.bus.TransferProcessResponse;
 import com.banano.kaliumwallet.databinding.FragmentTransferConfirmBinding;
 import com.banano.kaliumwallet.model.Address;
 import com.banano.kaliumwallet.model.Credentials;
+import com.banano.kaliumwallet.model.KaliumWallet;
 import com.banano.kaliumwallet.network.AccountService;
 import com.banano.kaliumwallet.network.model.response.AccountBalanceItem;
 import com.banano.kaliumwallet.network.model.response.AccountHistoryResponse;
 import com.banano.kaliumwallet.network.model.response.PendingTransactionResponse;
 import com.banano.kaliumwallet.network.model.response.PendingTransactionResponseItem;
+import com.banano.kaliumwallet.network.model.response.ProcessResponse;
 import com.banano.kaliumwallet.ui.common.ActivityWithComponent;
 import com.banano.kaliumwallet.ui.common.BaseDialogFragment;
 import com.banano.kaliumwallet.ui.common.SwipeDismissTouchListener;
@@ -68,9 +71,15 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
     AccountService accountService;
     @Inject
     Realm realm;
+    @Inject
+    KaliumWallet wallet;
 
-    HashMap<String, AccountBalanceItem> rawInMap;
-    HashMap<String, AccountBalanceItem> readyToSendMap;
+    // Stores accounts with pending blocks
+    HashMap<String, AccountBalanceItem> rawInMap = new HashMap<>();
+    // Stores accounts with no more pending blocks
+    HashMap<String, AccountBalanceItem> readyToSendMap = new HashMap<>();
+    // Stores hashes and amounts we need to receive to our own wallet
+    HashMap<String, String> hashAmountReceiveMap = new HashMap<>();
 
     /**
      * Create new instance of the dialog fragment (handy pattern if any data needs to be passed to it)
@@ -143,7 +152,6 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
         RxBus.get().register(this);
 
         // Determine how much is here and sum it up
-        readyToSendMap = new HashMap<>();
         if (getArguments().getSerializable("PRIVKEYMAP") != null) {
             rawInMap = (HashMap<String, AccountBalanceItem>) getArguments().getSerializable("PRIVKEYMAP");
         } else {
@@ -167,6 +175,11 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
         String totalAsReadable = NumberUtil.getRawAsUsableString(totalSum.toString());
 
         binding.transferConfirmOne.setText(getString(R.string.transfer_confirm_info_first, totalAsReadable));
+
+        // Lottie hardware acceleration
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            binding.animationView.useHardwareAcceleration(true);
+        }
 
         return view;
     }
@@ -225,19 +238,36 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
             exitWithError();
             return;
         }
+        boolean readyToSend = false;
         String account = transferHistoryResponse.getAccount();
         AccountHistoryResponse accountHistoryResponse = transferHistoryResponse.getAccountHistoryResponse();
         AccountBalanceItem accountBalanceItem = rawInMap.get(account);
         if (accountBalanceItem == null) {
-            Timber.d("Couldn't find account %s in rawInMap", account);
-            exitWithError();
-            return;
+            accountBalanceItem = readyToSendMap.get(account);
+            if (accountBalanceItem == null) {
+                Timber.d("Couldn't find account %s in rawInMap", account);
+                exitWithError();
+                return;
+            }
+            readyToSend = true;
         }
         if (accountHistoryResponse.getHistory().size() > 0) {
             accountBalanceItem.setFrontier(accountHistoryResponse.getHistory().get(0).getHash());
-            rawInMap.put(account, accountBalanceItem);
+            if (readyToSend) {
+                readyToSendMap.put(account, accountBalanceItem);
+            } else {
+                rawInMap.put(account, accountBalanceItem);
+            }
+        } else if (readyToSend) {
+            Timber.d("This account has no frontier but it should %s", account);
+            exitWithError();
+            return;
         }
-        accountService.requestPending(account);
+        if (readyToSend) {
+            startProcessing();
+        } else {
+            accountService.requestPending(account);
+        }
     }
 
     /**
@@ -290,6 +320,21 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
             }
             totalTransfered = totalTransfered.add(new BigInteger(accountBalanceItem.getBalance()));
             readyToSendMap.remove(processResponse.getAccount());
+            hashAmountReceiveMap.put(processResponse.getHash(), accountBalanceItem.getBalance());
+            startProcessing();
+        }
+    }
+
+    /**
+     * onStandardProcessResponse()
+     *
+     * Receive standard process response, this would be for a state block to our own wallet
+     *
+     * @param processResponse
+     */
+    public void onStandardProcessResponse(ProcessResponse processResponse) {
+        if (hashAmountReceiveMap.containsKey(processResponse.getHash())) {
+            hashAmountReceiveMap.remove(processResponse.getHash());
             startProcessing();
         }
     }
@@ -349,6 +394,11 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
             // Start requesting sends
             Map.Entry<String, AccountBalanceItem> item = readyToSendMap.entrySet().iterator().next();
             AccountBalanceItem info = item.getValue();
+            // See if we have frontier, if we don't request it
+            if (info.getFrontier() == null) {
+                accountService.requestAccountHistory(item.getKey());
+                return;
+            }
             Credentials credentials = realm.where(Credentials.class).findFirst();
             Address destination;
             if (credentials != null) {
@@ -359,6 +409,9 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
                 return;
             }
             accountService.requestSend(info.getFrontier(), destination, new BigInteger("0"), info.getPrivKey());
+        } else if (false && hashAmountReceiveMap.size() > 0) {
+            Map.Entry<String, String> item = hashAmountReceiveMap.entrySet().iterator().next();
+            accountService.requestReceive(wallet.getFrontierBlock(), item.getKey(), new BigInteger(item.getValue()));
         } else {
             showCompleteDialog();
         }

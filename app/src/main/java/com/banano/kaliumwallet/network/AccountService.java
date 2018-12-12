@@ -752,7 +752,7 @@ public class AccountService {
      * @param source   Destination
      * @param balance  Remaining balance after a send
      */
-    private void requestReceive(String previous, String source, BigInteger balance) {
+    public void requestReceive(String previous, String source, BigInteger balance) {
         StateBlock receiveBlock = new StateBlock(
                 BlockTypes.RECEIVE,
                 private_key,

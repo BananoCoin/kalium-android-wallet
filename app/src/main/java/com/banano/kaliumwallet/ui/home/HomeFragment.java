@@ -7,6 +7,7 @@ import androidx.databinding.BindingMethods;
 import androidx.databinding.DataBindingUtil;
 import android.graphics.drawable.PictureDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import androidx.annotation.NonNull;
@@ -317,6 +318,11 @@ public class HomeFragment extends BaseFragment implements FragmentOnBackListener
         // Add sttings fragment to drawer container
         FragmentTransaction ft = ((WindowControl) getActivity()).getFragmentUtility().getFragmentManager().beginTransaction();
         ft.replace(R.id.settings_frag_container, SettingsFragment.newInstance()).commit();
+
+        // Lottie hardware acceleration
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            binding.loadingAnimation.useHardwareAcceleration(true);
+        }
 
         return view;
     }

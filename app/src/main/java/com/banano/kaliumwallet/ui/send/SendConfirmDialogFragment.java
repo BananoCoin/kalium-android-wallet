@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -164,6 +165,11 @@ public class SendConfirmDialogFragment extends BaseDialogFragment {
         }
 
         binding.sendAmount.setText(String.format("%s BAN", amount));
+
+        // Lottie hardware acceleration
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            binding.animationView.useHardwareAcceleration(true);
+        }
 
         return view;
     }
