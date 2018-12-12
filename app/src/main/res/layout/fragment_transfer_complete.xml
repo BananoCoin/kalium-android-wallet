@@ -67,6 +67,7 @@
             android:paddingRight="65dp"
             android:textColor="@color/white_90"
             android:textSize="@dimen/address_text_size"
+            android:text="@string/transfer_close_text"
             app:layout_constraintEnd_toStartOf="@+id/transfer_guideline_vert"
             app:layout_constraintStart_toStartOf="@+id/transfer_guideline_vert"
             app:layout_constraintTop_toBottomOf="@+id/transfer_description"
