@@ -47,6 +47,7 @@ public class BaseDialogFragment extends DialogFragment {
     private static final int ZXING_CAMERA_PERMISSION = 1;
     protected View view;
     private String scanActivityTitle;
+    private boolean seedScanner = false;
 
     /**
      * Animate appearance of a view
@@ -148,6 +149,10 @@ public class BaseDialogFragment extends DialogFragment {
                     // permission was granted
                     Intent intent = new Intent(getActivity(), ScanActivity.class);
                     intent.putExtra(ScanActivity.EXTRA_TITLE, scanActivityTitle);
+                    if (seedScanner) {
+                        intent.putExtra(ScanActivity.EXTRA_SEED_MODE, seedScanner);
+                        seedScanner = false;
+                    }
                     startActivityForResult(intent, SCAN_RESULT);
                 }
             }
@@ -164,6 +169,7 @@ public class BaseDialogFragment extends DialogFragment {
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             // check first to see if camera permission has been granted
+            seedScanner = isSeedScanner;
             requestPermissions(new String[]{Manifest.permission.CAMERA}, ZXING_CAMERA_PERMISSION);
         } else {
             Intent intent = new Intent(getActivity(), ScanActivity.class);

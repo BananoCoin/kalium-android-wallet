@@ -160,6 +160,7 @@ public class TransferIntroDialogFragment extends BaseDialogFragment {
 
     private void hideLoadingOverlay() {
         if (binding != null && binding.progressOverlay != null) {
+            binding.transferScanQr.setEnabled(true);
             animateView(binding.progressOverlay, View.GONE, 0, 200);
             // Lighten window again
             Window window = getDialog().getWindow();
@@ -182,7 +183,7 @@ public class TransferIntroDialogFragment extends BaseDialogFragment {
                     String privKey;
                     String pubKey;
                     String account;
-                    if (NanoSeeds.isValid(NanoHelper.toByteArray(result))) {
+                    if (KaliumUtil.isValidSeed(result)) {
                         List<String> accountsToRequest = new ArrayList<>();
                         for (int i = 0; i < NUM_SWEEP; i++) {
                             privKey = KaliumUtil.seedToPrivate(result, i);

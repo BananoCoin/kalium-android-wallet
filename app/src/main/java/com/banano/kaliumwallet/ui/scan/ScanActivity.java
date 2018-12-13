@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.banano.kaliumwallet.KaliumUtil;
 import com.banano.kaliumwallet.R;
 import com.banano.kaliumwallet.model.Address;
 import com.google.zxing.Result;
@@ -108,7 +109,7 @@ public class ScanActivity extends BaseScannerActivity implements ZXingScannerVie
             }
         } else {
             String textResult = rawResult.getText();
-            if (NanoSeeds.isValid(NanoHelper.toByteArray(textResult))) {
+            if (KaliumUtil.isValidSeed(textResult)) {
                 Bundle conData = new Bundle();
                 conData.putString(QR_CODE_RESULT, textResult);
                 Intent intent = new Intent();
