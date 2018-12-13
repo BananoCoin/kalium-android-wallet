@@ -481,11 +481,15 @@ public class HomeFragment extends BaseFragment implements FragmentOnBackListener
     private void updateAmounts() {
         if (wallet != null) {
             binding.setWallet(wallet);
-            if (wallet.getAccountBalanceBananoRaw() != null &&
-                    wallet.getAccountBalanceBananoRaw().compareTo(new BigDecimal(0)) == 1) {
+            if (wallet.getAccountBalanceBananoRaw() != null) {
                 // if balance > 0, enable send button
-                binding.homeSendButton.setEnabled(true);
-                binding.homeSendButton.setBackground(getResources().getDrawable(R.drawable.bg_solid_button));
+                if (wallet.getAccountBalanceBananoRaw().compareTo(new BigDecimal(0)) == 1) {
+                    binding.homeSendButton.setEnabled(true);
+                    binding.homeSendButton.setBackground(getResources().getDrawable(R.drawable.bg_solid_button));
+                } else {
+                    binding.homeSendButton.setEnabled(false);
+                    binding.homeSendButton.setBackground(getResources().getDrawable(R.drawable.bg_solid_button_disabled));
+                }
                 // Hide placeholder
                 binding.bananoPlaceholder.setVisibility(View.GONE);
                 binding.amountBananoSymbol.setVisibility(View.VISIBLE);
