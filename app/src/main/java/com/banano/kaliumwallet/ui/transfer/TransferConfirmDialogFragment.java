@@ -24,7 +24,6 @@ import com.banano.kaliumwallet.network.model.response.AccountBalanceItem;
 import com.banano.kaliumwallet.network.model.response.AccountHistoryResponse;
 import com.banano.kaliumwallet.network.model.response.PendingTransactionResponse;
 import com.banano.kaliumwallet.network.model.response.PendingTransactionResponseItem;
-import com.banano.kaliumwallet.network.model.response.ProcessResponse;
 import com.banano.kaliumwallet.ui.common.ActivityWithComponent;
 import com.banano.kaliumwallet.ui.common.BaseDialogFragment;
 import com.banano.kaliumwallet.ui.common.SwipeDismissTouchListener;
@@ -66,6 +65,7 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
 
     private FragmentTransferConfirmBinding binding;
     private BigInteger totalTransfered = new BigInteger("0");
+    private boolean finished = false;
 
     @Inject
     AccountService accountService;
@@ -78,8 +78,8 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
     HashMap<String, AccountBalanceItem> rawInMap = new HashMap<>();
     // Stores accounts with no more pending blocks
     HashMap<String, AccountBalanceItem> readyToSendMap = new HashMap<>();
-    // Stores hashes and amounts we need to receive to our own wallet
-    HashMap<String, String> hashAmountReceiveMap = new HashMap<>();
+    // Need to be received by our own account
+    PendingTransactionResponse accountPending;
 
     /**
      * Create new instance of the dialog fragment (handy pattern if any data needs to be passed to it)
@@ -181,11 +181,15 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
             binding.animationView.useHardwareAcceleration(true);
         }
 
+        // Lock callbacks in accountService
+        accountService.setLock();
+
         return view;
     }
 
     @Override
     public void onDestroyView() {
+        accountService.unsetLock();
         super.onDestroyView();
         // unregister from bus
         RxBus.get().unregister(this);
@@ -279,18 +283,25 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
      */
     @Subscribe
     public void onPendingResponse(PendingTransactionResponse pendingTransactionResponse) {
-        // Store response for this account
-        AccountBalanceItem balanceItem = rawInMap.get(pendingTransactionResponse.getAccount());
-        if (balanceItem == null) {
-            Timber.d("Couldn't find account in pending response %s", pendingTransactionResponse.getAccount());
-            exitWithError();
-            return;
-        }
-        balanceItem.setPendingTransactions(pendingTransactionResponse);
-        rawInMap.put(pendingTransactionResponse.getAccount(), balanceItem);
+        // See if this was our account or a paper wallet account
+        if (!pendingTransactionResponse.getAccount().equals(getAddressString())) {
+            // Store response for this account
+            AccountBalanceItem balanceItem = rawInMap.get(pendingTransactionResponse.getAccount());
+            if (balanceItem == null) {
+                Timber.d("Couldn't find account in pending response %s", pendingTransactionResponse.getAccount());
+                exitWithError();
+                return;
+            }
+            balanceItem.setPendingTransactions(pendingTransactionResponse);
+            rawInMap.put(pendingTransactionResponse.getAccount(), balanceItem);
 
-        // Begin open/receive for pendings
-        processNextPending(pendingTransactionResponse.getAccount());
+            // Begin open/receive for pendings
+            processNextPending(pendingTransactionResponse.getAccount());
+        } else {
+            // Store result
+            accountPending = pendingTransactionResponse;
+            processKaliumPending();
+        }
     }
 
     /**
@@ -303,6 +314,12 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
      */
     @Subscribe
     public void onProcessResponse(TransferProcessResponse processResponse) {
+        // If was processed to our own account, behave differently
+        if (processResponse.getAccount().equals(getAddressString())) {
+            wallet.setFrontierBlock(processResponse.getHash());
+            processKaliumPending();
+            return;
+        }
         // Update balance and frontier of this account
         AccountBalanceItem accountBalanceItem = rawInMap.get(processResponse.getAccount());
         if (accountBalanceItem != null) {
@@ -320,21 +337,6 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
             }
             totalTransfered = totalTransfered.add(new BigInteger(accountBalanceItem.getBalance()));
             readyToSendMap.remove(processResponse.getAccount());
-            hashAmountReceiveMap.put(processResponse.getHash(), accountBalanceItem.getBalance());
-            startProcessing();
-        }
-    }
-
-    /**
-     * onStandardProcessResponse()
-     *
-     * Receive standard process response, this would be for a state block to our own wallet
-     *
-     * @param processResponse
-     */
-    public void onStandardProcessResponse(ProcessResponse processResponse) {
-        if (hashAmountReceiveMap.containsKey(processResponse.getHash())) {
-            hashAmountReceiveMap.remove(processResponse.getHash());
             startProcessing();
         }
     }
@@ -379,6 +381,38 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
     }
 
     /**
+     * Receive pendings for our own account
+     */
+    private void processKaliumPending() {
+        if (accountPending == null) {
+            exitWithError();
+            return;
+        }
+        HashMap<String, PendingTransactionResponseItem> pendingBlocks = accountPending.getBlocks();
+        if (pendingBlocks.size() > 0) {
+            Map.Entry<String, PendingTransactionResponseItem> entry = pendingBlocks.entrySet().iterator().next();
+            PendingTransactionResponseItem pendingTransactionResponseItem = entry.getValue();
+            pendingTransactionResponseItem.setHash(entry.getKey());
+            if (wallet.getOpenBlock() != null) {
+                // Receive block
+                accountService.requestReceive(wallet.getFrontierBlock(),
+                        pendingTransactionResponseItem.getHash(),
+                        new BigInteger(pendingTransactionResponseItem.getAmount()),
+                        getPrivateKeyString());
+            } else {
+                // Open account
+                accountService.requestOpen("0",
+                        pendingTransactionResponseItem.getHash(),
+                        new BigInteger(pendingTransactionResponseItem.getAmount()),
+                        getPrivateKeyString());
+            }
+            pendingBlocks.remove(entry.getKey());
+        } else {
+            startProcessing(); // Finish the process
+        }
+    }
+
+    /**
      * startProcessing()
      * Make the initial or next account_history request, if there's accounts with pending funds.
      * Otherwise make the initial or next send request, if there's no accounts with pending funds.
@@ -409,11 +443,33 @@ public class TransferConfirmDialogFragment extends BaseDialogFragment {
                 return;
             }
             accountService.requestSend(info.getFrontier(), destination, new BigInteger("0"), info.getPrivKey());
-        } else if (false && hashAmountReceiveMap.size() > 0) {
-            Map.Entry<String, String> item = hashAmountReceiveMap.entrySet().iterator().next();
-            accountService.requestReceive(wallet.getFrontierBlock(), item.getKey(), new BigInteger(item.getValue()));
+        } else if (!finished) {
+            finished = true;
+            accountService.requestPending(getAddressString());
         } else {
+            accountService.unsetLock();
+            accountService.requestUpdate();
             showCompleteDialog();
+        }
+    }
+
+    private String getAddressString() {
+        Credentials _credentials = realm.where(Credentials.class).findFirst();
+        if (_credentials == null) {
+            return null;
+        } else {
+            Credentials credentials = realm.copyFromRealm(_credentials);
+            return new Address(credentials.getAddressString()).getAddress();
+        }
+    }
+
+    private String getPrivateKeyString() {
+        Credentials _credentials = realm.where(Credentials.class).findFirst();
+        if (_credentials == null) {
+            return null;
+        } else {
+            Credentials credentials = realm.copyFromRealm(_credentials);
+            return credentials.getPrivateKey();
         }
     }
 

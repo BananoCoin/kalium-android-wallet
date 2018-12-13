@@ -93,6 +93,7 @@ public class AccountService {
     private String private_key;
     private Address address;
     private boolean isConnecting = false;
+    private boolean locked = false; // Stop auto-block processing if locked
 
     // Map previous hash to the block request
     private HashMap<String, StateBlock> previousPendingMap = new HashMap<>();
@@ -275,7 +276,7 @@ public class AccountService {
      */
     private void handleTransactionResponse(PendingTransactionResponseItem item) {
         Timber.d(item.toString());
-        if (!queueContainsRequestWithHash(item.getHash())) {
+        if (!queueContainsRequestWithHash(item.getHash()) && !locked) {
             // set balance to just the amount,
             // it will be added to total later when we verify the hash of the last transaction
             // BigInteger balance = wallet.getAccountBalanceBananoRaw().toBigInteger().add(new BigInteger(item.getAmount()));
@@ -587,6 +588,14 @@ public class AccountService {
         }
         requestQueue.poll();
         processQueue();
+    }
+
+    public void setLock() {
+        locked = true;
+    }
+
+    public void unsetLock() {
+        locked = false;
     }
 
     /**
