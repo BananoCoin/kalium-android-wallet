@@ -180,6 +180,11 @@
     <!-- Settings Menu -->
     <string name="settings_transfer">Load from Paper Wallet</string>
     <string name="transfer_error">An error has occurred during the transfer. Please try again later.</string>
+    <string name="paper_wallet">Paper Wallet</string>
+    <string name="kalium_wallet">Kalium Wallet</string>
+    <string name="transfer_manual_entry">Manual Entry</string>
+    <string name="mnemonic_phrase">Mnemonic Phrase</string>
+    <string name="raw_seed">Raw Seed</string>
     <!-- Initial Screen -->
     <string name="transfer_header">Transfer\nFunds:</string>
     <string name="transfer_intro">This process will transfer the funds from a paper wallet to your Kalium wallet.\n\nTap the \"%s\" button to start.</string>
