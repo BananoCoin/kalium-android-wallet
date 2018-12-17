@@ -1,7 +1,9 @@
 package com.banano.kaliumwallet;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.core.content.ContextCompat;
@@ -124,6 +126,17 @@ public class MainActivity extends AppCompatActivity implements WindowControl, Ac
 
         // Set app in foreground
         sharedPreferencesUtil.setAppBackgrounded(false);
+
+        // See if coming from a URI
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        Uri data = intent.getData();
+        if (data != null) {
+            Timber.d("inuri %s", data.toString());
+        } else {
+            Timber.d("inuri null");
+        }
+
 
         initUi();
     }

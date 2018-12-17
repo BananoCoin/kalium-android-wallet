@@ -167,7 +167,7 @@
     <!-- Initial Screen -->
     <string name="transfer_header">Bakiye\nTransferi:</string>
     <string name="transfer_intro">Bu işlem bir kağıt cüzdanda bulunan bakiyeyi senin Kalium cüzdanına aktaracak.\n\nBaşlamak için \"%s\" butonuna bas.</string>
-    <string name="transfer_qr_scan_hint">Bir Banano seedi \nveya private key'i tara</string>
+    <string name="transfer_qr_scan_hint">Bir Banano seedi \nveya private key\'i tara</string>
     <string name="transfer_qr_scan_error">Bu QR kodu geçerli bir seed içermiyor.</string>
     <string name="transfer_no_funds_toast">Bu seedin içinde hiç BANANO yok.</string>
     <!-- Confirm Screen -->
