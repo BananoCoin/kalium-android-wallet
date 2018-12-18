@@ -127,18 +127,8 @@ public class MainActivity extends AppCompatActivity implements WindowControl, Ac
         // Set app in foreground
         sharedPreferencesUtil.setAppBackgrounded(false);
 
-        // See if coming from a URI
-        Intent intent = getIntent();
-        String action = intent.getAction();
-        Uri data = intent.getData();
-        if (data != null) {
-            Timber.d("inuri %s", data.toString());
-        } else {
-            Timber.d("inuri null");
-        }
-
-
-        initUi();
+        // Send URI data to fragment
+        initUi(getIntent().getData() == null ? null : getIntent().getData().toString());
     }
 
     private File moveHeisenbergFromAssets() throws IOException {
@@ -217,7 +207,7 @@ public class MainActivity extends AppCompatActivity implements WindowControl, Ac
         return super.onOptionsItemSelected(item);
     }
 
-    private void initUi() {
+    private void initUi(String uri) {
         // set main content view
         setContentView(R.layout.activity_main);
 
@@ -236,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements WindowControl, Ac
             mFragmentUtility.clearStack();
             if (sharedPreferencesUtil.getConfirmedSeedBackedUp()) {
                 // go to home screen
-                mFragmentUtility.replace(HomeFragment.newInstance());
+                mFragmentUtility.replace(HomeFragment.newInstance(uri));
             } else {
                 // go to intro new wallet
                 mFragmentUtility.replace(IntroNewWalletFragment.newInstance(true));

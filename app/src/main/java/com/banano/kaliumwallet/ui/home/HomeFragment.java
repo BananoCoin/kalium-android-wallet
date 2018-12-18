@@ -108,14 +108,18 @@ public class HomeFragment extends BaseFragment implements FragmentOnBackListener
     private Runnable mRunnable;
     private HashMap<String, String> mContactCache = new HashMap<>();
     private AccountHistoryAdapter mAdapter;
+    private String mIntroUri;
 
     /**
      * Create new instance of the fragment (handy pattern if any data needs to be passed to it)
      *
      * @return HomeFragment
      */
-    public static HomeFragment newInstance() {
+    public static HomeFragment newInstance(String uri) {
         Bundle args = new Bundle();
+        if (uri != null) {
+            args.putString("URI_STR", uri);
+        }
         HomeFragment fragment = new HomeFragment();
         fragment.setArguments(args);
         return fragment;
@@ -324,6 +328,9 @@ public class HomeFragment extends BaseFragment implements FragmentOnBackListener
             binding.loadingAnimation.useHardwareAcceleration(true);
         }
 
+        // Set URI if we have one
+        mIntroUri = getArguments().getString("URI_STR", null);
+
         return view;
     }
 
@@ -438,6 +445,20 @@ public class HomeFragment extends BaseFragment implements FragmentOnBackListener
             binding.introText.exampleIntroText.setText(UIUtil.colorizeBanano(binding.introText.exampleIntroText.getText().toString(), getContext()));
             binding.loadingAnimation.setVisibility(View.GONE);
             binding.exampleCards.setVisibility(View.VISIBLE);
+        } else if (mIntroUri != null) {
+            // Open send screen with URI data if it's here.
+            Address address = new Address(mIntroUri);
+            if (address.isValidAddress()) {
+                if (getActivity() instanceof WindowControl) {
+                    // show send dialog
+                    SendDialogFragment dialog = SendDialogFragment.newInstance(address.getAddress(), address.getAmount());
+                    dialog.show(((WindowControl) getActivity()).getFragmentUtility().getFragmentManager(),
+                            SendDialogFragment.TAG);
+
+                    ((WindowControl) getActivity()).getFragmentUtility().getFragmentManager().executePendingTransactions();
+                }
+            }
+            mIntroUri = null;
         }
     }
 

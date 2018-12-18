@@ -77,6 +77,8 @@ public class SendDialogFragment extends BaseDialogFragment {
     private Activity mActivity;
     private ContactSelectionAdapter mAdapter;
     private boolean maxSend = false;
+    private String mAddressPrefill;
+    private String mAmountPrefill;
 
     /**
      * Create new instance of the dialog fragment (handy pattern if any data needs to be passed to it)
@@ -86,6 +88,15 @@ public class SendDialogFragment extends BaseDialogFragment {
     public static SendDialogFragment newInstance(String contactName) {
         Bundle args = new Bundle();
         args.putString("contact_name", contactName);
+        SendDialogFragment fragment = new SendDialogFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static SendDialogFragment newInstance(String address, String amount) {
+        Bundle args = new Bundle();
+        args.putString("address", address);
+        args.putString("amount", amount);
         SendDialogFragment fragment = new SendDialogFragment();
         fragment.setArguments(args);
         return fragment;
@@ -352,7 +363,31 @@ public class SendDialogFragment extends BaseDialogFragment {
             binding.sendAddressContact.setVisibility(View.GONE);
         }
 
+        // Prefill data if applicable
+        mAddressPrefill = getArguments().getString("address", null);
+        mAmountPrefill = getArguments().getString("amount", null);
+        if (mAddressPrefill != null) {
+            binding.sendAddress.setText(mAddressPrefill);
+        }
+        if (mAmountPrefill != null) {
+            binding.sendAmount.setText(NumberUtil.getRawAsUsableString(mAmountPrefill));
+        }
+
         return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        if (mAmountPrefill != null && mAddressPrefill != null) {
+            if (validateRequest() && mActivity instanceof WindowControl) {
+                // show confirm dialog
+                String sendAmount = wallet.getSendBananoAmount();
+                SendConfirmDialogFragment dialog = SendConfirmDialogFragment.newInstance(binding.sendAddress.getText().toString(), sendAmount);
+                dialog.setTargetFragment(this, SEND_RESULT);
+                dialog.show(((WindowControl) mActivity).getFragmentUtility().getFragmentManager(),
+                        SendConfirmDialogFragment.TAG);
+            }
+        }
     }
 
     @Override
@@ -529,10 +564,15 @@ public class SendDialogFragment extends BaseDialogFragment {
                         binding.sendAddress.requestFocus();
                         binding.sendAddress.clearFocus();
                     }
-
                     if (address.getAmount() != null) {
-                        wallet.setSendBananoAmount(address.getAmount());
+                        binding.sendAmount.setText(NumberUtil.getRawAsUsableString(address.getAmount()));
                         binding.setWallet(wallet);
+                    }
+                    // Skip to send confirm if both were provided
+                    if (address.getAddress() != null && address.getAmount() != null) {
+                        if (validateRequest()) {
+                            showSendConfirmDialog();
+                        }
                     }
                 }
             }
