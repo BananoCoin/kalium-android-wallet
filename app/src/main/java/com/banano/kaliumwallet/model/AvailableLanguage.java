@@ -19,6 +19,7 @@ public enum AvailableLanguage {
     KOREAN("KOREAN"),
     ITALIAN("ITALIAN"),
     MALAY("MALAY"),
+    POLISH("POLISH"),
     PORTUGUESE("PORTUGUESE"),
     ROMANIAN("ROMANIAN"),
     RUSSIAN("RUSSIAN"),

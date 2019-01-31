@@ -1,0 +1,205 @@
+<resources>
+    <string name="app_name" translatable="false">Kalium</string>
+
+    <string name="version_display" translatable="false">Kalium v%1$s</string>
+
+    <!-- Generic -->
+    <string name="dialog_cancel">Anuluj</string>
+    <string name="dialog_close">Zamknij</string>
+    <string name="dialog_confirm">Potwierdz</string>
+
+    <string name="privacy_policy_url" translatable="false">https://bananocoin.github.io/kalium/privacy.html</string>
+    <!-- API -->
+    <string name="monkey_api_url" translatable="false">https://bananomonkeys.herokuapp.com/image?address=%s</string>
+    <!-- Intro Welcome Screen -->
+    <string name="intro_welcome_title">Witam w Kalium. Żeby kontynuować, możesz stworzyć nowy portfel albo importować go.</string>
+    <string name="intro_welcome_new_wallet">Nowy Portfel</string>
+    <string name="intro_welcome_have_wallet">Importuj Portfel</string>
+    <!-- Intro New Wallet Screens -->
+    <string name="intro_new_wallet_seed">Pod tym jest nasiono twojego portfela. Ważne jest, aby je zapisać (np. na kartce) i nigdy nie zapisywać jako plaintext albo screenshot.</string>
+    <string name="intro_new_wallet_seed_copied">Nasiono skopiowane do schowka. Możesz je wklejić przez 2 minuty.</string>
+    <string name="intro_new_wallet_seed_header">Nasiono</string>
+    <string name="intro_new_wallet_seed_backup_header">Zapisałeś swoje nasiono?</string>
+    <string name="intro_new_wallet_backup">Czy jesteś pewny że zapisałeś nasiono portfela?</string>
+    <string name="intro_new_wallet_backup_yes">Tak</string>
+    <string name="intro_new_wallet_backup_no">Nie</string>
+    <string name="intro_new_wallet_warning_header">Prosze nie kłam.</string>
+    <string name="intro_new_wallet_warning">Nie myślisz o tym ale zgubisz nasiono jeżeli nie zrobisz kopii zapasowej.</string>
+    <string name="intro_new_wallet_not_lying">Nie kłamie!</string>
+    <string name="intro_new_wallet_okay">Okej :(</string>
+    <!-- Intro Import Wallet Screen -->
+    <string name="intro_seed_header">Importuj nasiono.</string>
+    <string name="intro_seed_info">Prosze zapisz swoje nasiono poniżej.</string>
+    <string name="intro_seed_invalid">Nasiono jest nieważne</string>
+    <!-- Pin Screen -->
+    <string name="pin_create_title">Stwórz czterocyfrowy PIN</string>
+    <string name="pin_confirm_title">Potwierdz swój PIN</string>
+    <string name="pin_enter_title">Wpisz PIN</string>
+    <string name="pin_confirm_error">PIN'y nie pasują</string>
+    <string name="pin_error">Wprowadzono nieważny kod PIN</string>
+    <string name="fingerprint_text">Czujnik dotyku</string>
+
+    <!-- Home Screen -->
+    <string name="home_send_cta">Wyślij</string>
+    <string name="home_receive_cta">Odbierz</string>
+    <string name="home_explore_url" translatable="false">https://creeper.banano.cc/explorer/block/%s</string>
+    <string name="account_explore_url" translatable="false">https://creeper.banano.cc/explorer/account/%s</string>
+    <string name="error message">Był problen z połączeniem. Prosze spróbuj ponownie.</string>
+    <string name="transaction_header">Transakcje</string>
+    <string name="history_sent">Wysłane</string>
+    <string name="history_received">Odebrane</string>
+    <string name="transaction_details">Zobacz Szczegóły</string>
+    <!-- Shown when there are no transactions -->
+    <string name="example_card_intro">Witam w Kalium. Kiedy dostaniesz BANANO, transakcje pokażą się w ten sposób:</string>
+    <string name="example_card_little">Mało</string>
+    <string name="example_card_lot">Dużo</string>
+    <string name="example_card_to">do losowej małpy</string>
+    <string name="example_card_from">od losowej małpy</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Ustawienia</string>
+    <string name="settings_local_currency">Zmień walutę</string>
+    <string name="settings_change_language">Język</string>
+    <string name="settings_default_language_string">Domyślny język systemu</string>
+    <string name="settings_backup_seed">Zapisz Nasiono</string>
+    <string name="settings_change_rep">Zmień przedstawiciela</string>
+    <string name="settings_share">Udostępnij Kalium</string>
+    <string name="settings_logout">Wyloguj</string>
+    <string name="settings_logout_alert_title">UWAGA</string>
+    <string name="settings_logout_alert_message">Wylogowanie usunie twoje nasiono i wszystkie dane związane z Kalium. Jeżeli twoje nasiono nie jest zapisane, nigdy nie odzyskasz dostępu do swoich środków.</string>
+    <string name="settings_logout_alert_confirm_cta">Skasuj nasiono i wyloguj?</string>
+    <string name="settings_logout_alert_cancel_cta">Anuluj</string>
+    <string name="settings_logout_warning_title">Czy jesteś pewny?</string>
+    <string name="settings_logout_warning_message">Jeżeli zapisałeś nasiono nie musisz się niczego obawiać.</string>
+    <string name="settings_logout_warning_confirm">Tak</string>
+    <string name="settings_logout_warning_cancel">Anuluj</string>
+    <string name="settings_manage_header">Zarządzaj</string>
+    <string name="settings_preferences_header">Preferencje</string>
+    <string name="settings_disable_fingerprint">Metoda Uwierzytelniania</string>
+    <string name="settings_fingerprint_method">Odcisk Palca</string>
+    <string name="settings_pin_method">PIN</string>
+    <string name="settings_privacy_policy"><u>Polityka Prywatności</u></string>
+    <!-- Change Rep -->
+    <string name="change_representative_header">Zmień Przedstawiciela</string>
+    <string name="change_representative_header_short">Zmień</string>
+    <string name="change_representative_info_header">Co to jest przedstawiciel?</string>
+    <string name="change_representative_info">Przedstawiciel jest kontem które głosi za porozumienie w sieci. Siła głosowania jest mierzona przez saldo, możesz delegować swoje saldo żeby zwiększyć siłę głosowania przedstawiciela któremu ufasz. Twój przedstawiciel nie ma mocy wydawania swoich środków. Powinieneś wybrać przedstawiciela które jest prawie zawsze online i jest godny zaufania.</string>
+    <string name="change_representative_dialog_close">Zamknij</string>
+    <string name="change_representative_change">Zmień</string>
+    <string name="change_representative_cancel">Anuluj</string>
+    <string name="change_representative_invalid">Nieprawidłowy Adres Przedstawiciela</string>
+    <string name="change_representative_current_header">Obecnie Representowany Przez</string>
+    <string name="change_representative_hint">Wpisz nowego Przedstawiciela</string>
+    <string name="change_representative_success">Przedstawiciel Zmieniony</string>
+    <string name="change_representative_error">Nie udało zmienić się przedstawiciela. Spróbuj Póżniej</string>
+    <string name="change_representative_fingerprint">Potwierdz odcisk palca żeby zmienić przedstawiciela</string>
+    <string name="change_representative_pin">Wpisz PIN żeby zmienić przedstawiciela</string>
+    <!-- Share -->
+    <string name="share_title">Przetłumaczone przez 1234saws #0883 na Discord.</string>
+    <string name="share_extra">Zobacz Kalium! Oficjalny portfel Banano dla Android!</string>
+    <!-- Backup Seed -->
+    <string name="settings_show_seed">Zapisz nasiono portfela</string>
+    <string name="settings_fingerprint_title">Potwierdz odcisk palca żeby zapisać nasiono portfela.</string>
+    <string name="settings_pin_title">Wpisz PIN żeby zobaczyć nasiono portfela.</string>
+
+    <!-- Receive Screen -->
+    <string name="receive_share_cta">Udostępnij</string>
+    <string name="receive_copy_cta">Skopiuj Adres</string>
+    <string name="receive_copied">Adres Skopiowany</string>
+    <string name="receive_share_title">Udostępnij Przez…</string>
+    <string name="receive_card_label_one" translatable="false">$BAN</string>
+    <string name="receive_card_label_two" translatable="false">BANANO.CC</string>
+    <string name="receive_card_title">Banano</string>
+    <string name="receive_qrcode_description">Kod QR</string>
+
+    <!-- Send Screens -->
+    <string name="send_title">Wyślij Od</string>
+    <string name="send_address_hint">Wpisz Adres</string>
+    <string name="send_amount_hint">Wpisz Ilość</string>
+    <string name="send_max">Max</string>
+    <string name="send_send_cta">Wyślij</string>
+    <string name="send_balance" translatable="false">(%s BAN)</string>
+    <string name="send_sent">Wysłane</string>
+    <string name="send_scan_qr">Skanuj Kod QR</string>
+    <string name="send_sending">Wysyłanie</string>
+    <string name="send_to">Do:</string>
+    <string name="sent_to">Wysłane Do:</string>
+    <string name="send_alert_dialog_ok">OK</string>
+    <string name="send_alert_dialog_title">Niewłaściwy Input</string>
+    <string name="send_invalid_address">Wpisany Addres jest nieważny</string>
+    <string name="send_insufficient_balance">Niewystarczające środki</string>
+    <string name="send_enter_address">Wpisz Adres</string>
+    <string name="send_enter_amount">Wpisz ilość</string>
+    <string name="send_amount_error">Ilość wpisana jest nieważna</string>
+    <string name="send_generic_error">Wystąpił błąd. Spróbuj póżniej</string>
+    <string name="send_no_frontier">Nie znaleziono konta(konto może nie być otwarte)</string>
+    <string name="send_fingerprint_description">Potwierdz odcisk palca aby wysłać %s Banano</string>
+    <string name="send_pin_description">Wyślij %s Banano?</string>
+
+    <!-- Address Book/Contacts -->
+    <string name="contact_add">Dodaj Kontakt</string>
+    <string name="contact_added">%s został dodany do kontaktów!</string>
+    <string name="contact_invalid_name">Niewłaściwe imię Kontaktu</string>
+    <!-- Add Contact Dialog -->
+    <string name="contact_add_header">Dodaj Kontakt:</string>
+    <string name="contact_add_button">Dodaj Kontakt</string>
+    <string name="contact_name_hint">Wpisz imię @</string>
+    <string name="contact_name_missing">Wybierz imię dla tego kontaktu</string>
+    <string name="contact_name_exists">Kontakt już istnieje</string>
+    <string name="contact_address_hint">Wpisz Adres</string>
+    <string name="contact_address_exists">Kontakt już ma taką nazwę</string>
+    <!-- Contacts Settings -->
+    <string name="contact_header">Kontakty</string>
+    <string name="contact_settings_item">Kontakty</string>
+    <!-- Contact Detail -->
+    <string name="contact_view_header">Kontakt:</string>
+    <string name="contact_remove_header">Usuń:</string>
+    <string name="contact_remove_btn">Usuń kontakt</string>
+    <string name="contact_remove_sure">Czy jesteś pewny że chcesz usunąć %s?</string>
+    <!-- Export/Import -->
+    <string name="contact_removed">%s został usunięty z kontaktów</string>
+    <string name="contact_export_none">Nie ma kontaktów do eksportowania</string>
+    <string name="contact_export_error">Nie udało się eksportować kontaktów</string>
+    <string name="contact_import_error">Nie udało się importować kontaktów</string>
+    <string name="contact_import_success">Z powodzeniem importowao %d contacts</string>
+    <string name="contact_import_none">Nie znaleziono kontaktów do importowania</string>
+    <string name="contact_import_warning_header">Uwaga</string>
+    <string name="contact_import_permission_error">Prosze pozwolić Kalium na czytanie pamięci urządzenia.</string>
+    <string name="contact_export_permission_error">Prosze pozwolić Kalium na zapisywanie plików na pamięci urządzenia.</string>
+    <string name="contact_export_success">Kontakty zapisane do %s</string>
+
+    <!-- Push Notifications -->
+    <string name="notifications_settings">Powiadomienia</string>
+    <string name="generic_on">Włączone</string>
+    <string name="generic_off">Wyłączone</string>
+    <string name="notification_title">Otrzymano %s BANANO</string>
+    <string name="notification_body">Otwórz Kalium żeby zobaczyć tą transakcje.</string>
+    <string name="notificaiton_header_suplement">Naciśnij aby Otworzyć</string>
+
+    <!-- Transfer Funds -->
+    <!-- Settings Menu -->
+    <string name="settings_transfer">Załaduj z Papierowego Portfela</string>
+    <string name="transfer_error">Podczas transferu wystąpił błąd. Proszę spróbować póżniej.</string>
+    <string name="paper_wallet">Papierowy Portfel</string>
+    <string name="kalium_wallet">Portfel Kalium</string>
+    <string name="transfer_manual_entry">Wpisanie Manualne</string>
+    <string name="mnemonic_phrase">Fraza Mnemnoniczna</string>
+    <string name="raw_seed">Surowe Nasiono</string>
+    <!-- Initial Screen -->
+    <string name="transfer_header">Transferuj\nŚrodki:</string>
+    <string name="transfer_intro">Ten proces trensferuje środki z portfela papierowego do twojego portfela Kalium.\n\nNaciśnij \"%s\" przycisk aby zacząć.</string>
+    <string name="transfer_qr_scan_hint">Skanuj Nasiono \nBanano lub klucz prywatny</string>
+    <string name="transfer_qr_scan_error">Ten kod QR nie zawiera ważnego nasiona.</string>
+    <string name="transfer_no_funds_toast">To nasiono nie zawiera żadnego BANANO.</string>
+    <!-- Confirm Screen -->
+    <string name="transfer_confirm_info_first">Portfel z saldem %s BANANO został wykryty.</string>
+    <string name="transfer_confirm_info_second">Naciśnij potwierdz aby transferować środki.</string>
+    <string name="transfer_confirm_info_third">Transfer może zająć kilka sekund żeby się zakończyć.</string>
+    <string name="transfer_loading_text">Transferuje</string>
+    <!-- Complete Screen -->
+    <string name="transfer_complete_text">%s BANANO zostało z powodzeniem przesłane do twojego portfela Kalium.</string>
+    <string name="transfer_close_text">Naciśnij gdziekolwiek żeby zamknąć okno.</string>
+
+    <!-- Scan Screen -->
+    <string name="scan_send_instruction_label">Zeskanuj  \naddres Kod QR </string>
+</resources>
